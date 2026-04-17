@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTRNA. - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.typekit.net/yhs6ric.css" />
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+    <div style="margin-bottom: 10px; display: flex; gap: 5px;">
+        <button onclick="switchMode('mobile')" style="padding: 5px 10px; cursor: pointer;">Mobile</button>
+        <button onclick="switchMode('desktop')" style="padding: 5px 10px; cursor: pointer;">Desktop</button>
+    </div>
+
+    <div id="viewport" class="view-mobile">
+        <header class="login-header">
+            <div class="logo" style="font-family: 'strelka', sans-serif; font-weight: 700;">VTRNA.</div>
+            <nav class="nav-top">
+                <button class="nav-btn nav-text" onclick="alert('About Us - Próximamente')">About Us</button>
+                <button class="nav-btn nav-text" onclick="alert('FAQ - Próximamente')">FAQ</button>
+                <button class="nav-btn nav-secondary" onclick="alert('Sign Up - Próximamente')">Sign Up</button>
+                <button class="nav-btn nav-primary" onclick="alert('Estás en Login')">Login</button>
+            </nav>
+            <button class="nav-menu-btn" onclick="toggleMobileMenu()">
+                <img src="../../assets/menu-svgrepo-com.svg" alt="menu" style="width: 20px; height: 20px;">
+            </button>
+        </header>
+
+        <!-- MOBILE MENU DROPDOWN -->
+        <div id="mobile-menu" class="mobile-menu">
+            <button class="mobile-menu-item nav-text" onclick="alert('About Us - Próximamente'); toggleMobileMenu()">About Us</button>
+            <button class="mobile-menu-item nav-text" onclick="alert('FAQ - Próximamente'); toggleMobileMenu()">FAQ</button>
+            <button class="mobile-menu-item nav-secondary" onclick="alert('Sign Up - Próximamente'); toggleMobileMenu()">Sign Up</button>
+            <button class="mobile-menu-item nav-primary" onclick="alert('Estás en Login'); toggleMobileMenu()">Login</button>
+        </div>
+
+        <div class="login-body">
+            <div class="form-container" style="padding:100px 20px; height: 100%; display:flex; flex-direction:column; justify-content:center;">
+                <h1 class="form-title" style="font-size:28px; font-weight:900; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; text-align:center; height: stretch;">Log in</h1>
+                
+                <form class="login-form">
+                    <div class="form-group">
+                        <label class="form-label">Correo</label>
+                        <div class="form-input-wrapper">
+                            <img src="../../assets/mail-alt-svgrepo-com.svg" alt="mail" class="form-input-icon">
+                            <input type="email" class="form-input" placeholder="tu@email.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contraseña</label>
+                        <div class="form-input-wrapper">
+                            <img src="../../assets/lock-alt-svgrepo-com.svg" alt="lock" class="form-input-icon">
+                            <input type="password" class="form-input" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" onclick="event.preventDefault(); mostrarLoginModal()">Iniciar Sesión</button>
+                </form>
+
+                <div class="form-footer">
+                    <a href="#" class="form-link" onclick="event.preventDefault(); alert('Forgot Password - Próximamente')">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <div class="form-divider"></div>
+
+                <div class="form-signup">
+                    <p class="form-signup-text">¿No tienes cuenta?</p>
+                    <a href="#" class="form-link strong" onclick="event.preventDefault(); alert('Sign Up - Próximamente')">Crear Cuenta</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN SUCCESS MODAL -->
+    <div id="login-modal" class="login-modal-overlay">
+      <div class="login-modal-content">
+        <div style="padding: 40px 20px; text-align: center;">
+          <div style="font-size: 64px; margin-bottom: 20px;">
+            <img src="../../assets/done/user-check-svgrepo-com.svg" alt="success" style="width: 80px; height: 80px;">
+          </div>
+          <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 10px;">¡Sesión Iniciada!</h2>
+          <p style="font-size: 14px; color: #666; margin-bottom: 30px;">Bienvenido de vuelta.</p>
+          <button class="btn-primary" style="width: 100%; padding: 12px; border-radius: 24px;" onclick="cerrarLoginModal()">Continuar</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        let currentMode = 'mobile';
+
+        function switchMode(m) {
+            currentMode = m;
+            const viewport = document.getElementById('viewport');
+            if (m === 'mobile') {
+                viewport.className = 'view-mobile';
+            } else {
+                viewport.className = 'view-desktop';
+                // Cerrar menú y modal al cambiar a desktop
+                const menu = document.getElementById('mobile-menu');
+                if (menu) menu.classList.remove('active');
+                const modal = document.getElementById('login-modal');
+                if (modal) modal.classList.remove('active');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) {
+                menu.classList.toggle('active');
+            }
+        }
+
+        function mostrarLoginModal() {
+            const modal = document.getElementById('login-modal');
+            if (modal) {
+                modal.classList.add('active');
+                setTimeout(() => {
+                    cerrarLoginModal();
+                }, 1500);
+            }
+        }
+
+        function cerrarLoginModal() {
+            const modal = document.getElementById('login-modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+    </script>
+
+</body>
+</html>

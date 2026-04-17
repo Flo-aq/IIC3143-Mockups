@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VTRNA. - Prototype v2.8</title>
+    <link
+      rel="preconnect" href="https://fonts.googleapis.com"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://use.typekit.net/yhs6ric.css" />
+    <link rel="stylesheet" href="swipe.css" />
+  </head>
+  <body>
+    <div class="layout-switcher">
+      <button id="btn-m" class="active" onclick="switchMode('mobile')">
+        Mobile View
+      </button>
+      <button id="btn-d" onclick="switchMode('desktop')">Desktop View</button>
+    </div>
+
+    <div id="viewport" class="view-mobile"></div>
+
+    <div id="modal-oferta" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <h3
+          style="
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+          "
+        >
+          Mandar Oferta
+        </h3>
+        <input
+          type="number"
+          style="
+            width: 100%;
+            padding: 15px;
+            border: 1px solid black;
+            margin-bottom: 20px;
+            border-radius: 20px;
+          "
+          placeholder="TU PRECIO ($)"
+        />
+        <p
+          style="
+            font-size: 9px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+          "
+        >
+          Medios de contacto:
+        </p>
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            <input type="checkbox" checked /> Whatsapp
+          </div>
+          <div class="checkbox-item"><input type="checkbox" /> Instagram</div>
+        </div>
+        <button class="btn-primary" onclick="closeModals()">Enviar</button>
+        <button
+          style="
+            width: 100%;
+            margin-top: 15px;
+            background: none;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 24px;
+          "
+          onclick="closeModals()"
+        >
+          CANCELAR
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let currentMode = "mobile";
+      let currentFeed = "global";
+      let sidebarOpen = false;
+      let infoExpanded = false;
+      let activeFilter = null;
+      let filterOpen = false;
+      let followedViewMode = "grid"; // grid, row, list
+      let selectedUsers = new Set(["@flore", "@vntg_shop"]); // Al menos 2 seleccionados
+
+      const followedUsers = [
+        { handle: "@flore", name: "Flore", color: "#667eea" },
+        { handle: "@archive", name: "Archive", color: "#764ba2" },
+        { handle: "@vntg_shop", name: "Vintage Shop", color: "#f093fb" },
+        { handle: "@streetwear", name: "Streetwear", color: "#f5576c" },
+        { handle: "@vintage_club", name: "Vintage Club", color: "#4facfe" },
+        { handle: "@second_hand", name: "Second Hand", color: "#00f2fe" },
+        { handle: "@trendy_vibes", name: "Trendy Vibes", color: "#43e97b" },
+        { handle: "@thrift_king", name: "Thrift King", color: "#38f9d7" },
+        { handle: "@retro_style", name: "Retro Style", color: "#fa709a" },
+        { handle: "@cool_finds", name: "Cool Finds", color: "#fee140" },
+      ];
+
+      const filters = {
+        Seguidos: followedUsers.map((u) => u.handle),
+        Categoría: ["Chaqueta", "Pantalón", "Calzado", "Accesorios"],
+        Talla: ["S", "M", "L", "XL"],
+        Precio: ["$0 - $10k", "$10k - $30k", "$30k+"],
+      };
+
+      function toggleUserSelection(handle) {
+        if (selectedUsers.has(handle)) {
+          selectedUsers.delete(handle);
+        } else {
+          selectedUsers.add(handle);
+        }
+        render();
+      }
+
+      function switchFollowedView(mode) {
+        followedViewMode = mode;
+        render();
+      }
+
+      function switchMode(m) {
+        currentMode = m;
+        document.getElementById("viewport").className =
+          m === "mobile" ? "view-mobile" : "view-desktop";
+        document
+          .getElementById("btn-m")
+          .classList.toggle("active", m === "mobile");
+        document
+          .getElementById("btn-d")
+          .classList.toggle("active", m === "desktop");
+        render();
+      }
+
+      function toggleFeed(f) {
+        currentFeed = f;
+        activeFilter = null;
+        render();
+      }
+      function closeModals() {
+        document.getElementById("modal-oferta").classList.remove("active");
+      }
+      function toggleInfo() {
+        infoExpanded = !infoExpanded;
+        render();
+      }
+      function toggleDropdown(f) {
+        activeFilter = activeFilter === f ? null : f;
+        render();
+      }
+      function toggleFilter() {
+        filterOpen = !filterOpen;
+        render();
+      }
+
+      function render() {
+        const viewport = document.getElementById("viewport");
+        const logo = `<header style="font-family:'strelka'; font-weight:700; font-size:14px;">VTRNA.</header>`;
+
+        const feedToggle = `
+                <div class="feed-section">
+                    <div class="feed-toggle">
+                        <span class="${currentFeed === "global" ? "active" : ""}" onclick="toggleFeed('global')">Global</span>
+                        <span class="${currentFeed === "seguidos" ? "active" : ""}" onclick="toggleFeed('seguidos')">Seguidos</span>
+                    </div>
+                </div>`;
+
+        let filterItems = Object.keys(filters).filter((k) => k !== "Seguidos");
+        if (currentFeed === "seguidos") filterItems.unshift("Seguidos");
+
+        const filterSection = `
+                <div class="filter-container">
+                    <div class="filter-bar">
+                        ${filterItems
+                          .map(
+                            (f) => `
+                            <div class="filter-banner ${activeFilter === f ? "active" : ""}" onclick="toggleDropdown('${f}')">
+                                ${f} ${activeFilter === f ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline; margin-left:4px;"><path d="M6 15L12 9L18 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline; margin-left:4px;"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'}
+                            </div>
+                        `,
+                          )
+                          .join("")}
+                    </div>
+                    <div class="filter-dropdown ${activeFilter ? "open" : ""}">
+                        <p style="font-size:9px; font-weight:900; margin-bottom:10px; text-transform:uppercase;">Filtrar ${activeFilter}:</p>
+                        ${
+                          activeFilter === "Seguidos"
+                            ? `
+                            <div style="overflow-x:auto; display:flex; gap:12px; padding-bottom:10px;">
+                                ${followedUsers
+                                  .map(
+                                    (user) => `
+                                    <div onclick="toggleUserSelection('${user.handle}')" style="cursor:pointer; text-align:center; flex-shrink:0; width:50px; overflow:hidden;">
+                                        <div style="width:50px; height:50px; background:#111812; border-radius:50%; margin:0 auto 8px; border:${selectedUsers.has(user.handle) ? "3px solid #111812" : "2px solid #ddd"}; display:flex; align-items:center; justify-content:center; color:white; font-weight:900; font-size:24px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                                        <div style="font-size:9px; font-weight:700; text-transform:uppercase;">${user.handle}</div>
+                                        <div style="font-size:9px; color:#666; height: 12px; overflow: hidden;">${user.name}</div>
+                                    </div>
+                                `,
+                                  )
+                                  .join("")}
+                            </div>
+                        `
+                            : `
+                            <div class="checkbox-group">
+                                ${
+                                  activeFilter
+                                    ? filters[activeFilter]
+                                        .map(
+                                          (opt) => `
+                                    <div class="checkbox-item"><input type="checkbox"> ${opt}</div>
+                                `,
+                                        )
+                                        .join("")
+                                    : ""
+                                }
+                            </div>
+                        `
+                        }
+                    </div>
+                </div>`;
+
+        const cardContent = `
+                <div style="width:100%; height:100%; background:#ddd; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                    ${currentMode === "mobile" ? `<div id="rewind-top-card" style="position:absolute; top:20px; right:20px; display:flex; align-items:center; z-index:30;">
+                        <button class="btn-premium-shadow" style="width:50px; height:50px; display:flex; align-items:center; justify-content:center; color:#E6A817;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.5 20.5C17.1944 20.5 21 16.6944 21 12C21 7.30558 17.1944 3.5 12.5 3.5C7.80558 3.5 4 7.30558 4 12C4 13.5433 4.41128 14.9905 5.13022 16.238M1.5 15L5.13022 16.238M6.82531 12.3832L5.47107 16.3542L5.13022 16.238" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                    </div>` : ""}
+                    <div style="position:absolute; bottom:20px; right:20px; display:flex; align-items:center; z-index:30;">
+                        <div style="width:40px; height:40px; border-radius:50%; background:#111812; border:1.5px solid #111812; display:flex; align-items:center; justify-content:center; position:relative;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><button style="width:18px; height:18px; border-radius:50%; background:var(--accent); color:white; border:none; font-size:14px; position:absolute; top:-5px; right:-5px; cursor:pointer;">+</button></div>
+                    </div>
+                    <svg width="200" height="200" viewBox="0 0 328.554 328.554" fill="#999" xmlns="http://www.w3.org/2000/svg"><g><path d="m286.013,25.754h-34.502c-52.755-27.444-98.56-25.89-127.815-19.665-26.623,5.663-44.507,15.938-50.381,19.665h-30.774c-23.457,0-42.541,19.083-42.541,42.54v215.407c0,23.457 19.084,42.541 42.541,42.541h243.472c23.457,0 42.541-19.084 42.541-42.541v-215.407c-5.68434e-14-23.457-19.084-42.54-42.541-42.54zm-159.196-4.995c35.623-7.577 71.808-3.071 107.734,13.378l-71.922,46.661-72.726-47.183c8.041-4.071 20.664-9.399 36.914-12.856zm106.904,31.797l-29.067,71.268-29.066-33.553 58.133-37.715zm-84.05,37.715l-29.066,33.553-29.067-71.268 58.133,37.715zm-134.671,193.43v-215.407c0-15.186 12.355-27.54 27.541-27.54h27.983l40.804,100.047c0.985,2.415 3.153,4.145 5.726,4.568 0.407,0.067 0.814,0.1 1.22,0.1 2.155,0 4.231-0.931 5.668-2.589l32.835-37.902v206.264h-114.236c-15.186,0-27.541-12.355-27.541-27.541zm298.554,0c0,15.187-12.355,27.541-27.541,27.541h-114.236v-202.461l29.54,34.098c1.437,1.658 3.513,2.589 5.668,2.589 0.405,0 0.813-0.033 1.22-0.1 2.573-0.424 4.741-2.153 5.726-4.568l40.804-100.047h31.278c15.186,0 27.541,12.354 27.541,27.54v215.408z"/><path d="m219.485,163.498h-25c-4.142,0-7.5,3.357-7.5,7.5s3.358,7.5 7.5,7.5h25c4.142,0 7.5-3.357 7.5-7.5s-3.358-7.5-7.5-7.5z"/><path d="m219.485,203.632h-25c-4.142,0-7.5,3.357-7.5,7.5s3.358,7.5 7.5,7.5h25c4.142,0 7.5-3.357 7.5-7.5s-3.358-7.5-7.5-7.5z"/><path d="m219.485,243.765h-25c-4.142,0-7.5,3.357-7.5,7.5s3.358,7.5 7.5,7.5h25c4.142,0 7.5-3.357 7.5-7.5s-3.358-7.5-7.5-7.5z"/><path d="m219.485,283.9h-25c-4.142,0-7.5,3.357-7.5,7.5s3.358,7.5 7.5,7.5h25c4.142,0 7.5-3.357 7.5-7.5s-3.358-7.5-7.5-7.5z"/></g></svg>
+                    <div class="card-content-overlay ${infoExpanded ? "expanded" : ""}">
+                        <b style="font-size:20px; text-transform:uppercase;">VINTAGE 90s JACKET</b>
+                        <p class="info-text">Chaqueta vintage original de los 90. Cuero sintético en perfecto estado. Sin detalles de uso, calce oversize ideal para capas.</p>
+                        <div class="card-tags">
+                            <div class="tag">$25.000</div>
+                            <div class="tag">TALLA L</div>
+                            ${currentMode === "mobile" ? `<button class="tag tag-info" onclick="toggleInfo()" style="display:flex; align-items:center; gap:6px;">${infoExpanded ? `VER MENOS <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(180deg);"><path d="M6 9L12 15L18 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `VER MÁS <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 9L12 15L18 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}</button>` : ""}
+                        </div>
+                    </div>
+                </div>`;
+
+        if (currentMode === "mobile") {
+          viewport.innerHTML = `
+                    ${logo}
+                    ${feedToggle}
+                    <div style="text-align: left;padding: 6px 20px;border-bottom:1px solid var(--line);cursor:pointer;font-weight:900;font-size: 10px;text-transform:uppercase;display:flex;align-items:center;justify-content: left;gap:8px;position:relative;z-index:101;" onclick="toggleFilter()">
+                        FILTROS
+                        ${filterOpen ? `<img src="../../assets/chevron-up-svgrepo-com.svg" width="14" height="14"/>` : `<img src="../../assets/chevron-down-svgrepo-com.svg" width="14" height="14"/>`}
+                    </div>
+                    ${filterOpen ? `
+                    <div class="filter-container" style="position:absolute; top:122px; left:0; right:0; z-index:100; background: #F8F7F4; border-bottom:1px solid var(--line);">
+                        <div class="filter-header-actions">
+                            <button class="btn-filter-action" style="color: #999; flex:1; text-align: left;">Limpiar</button>
+                            <button class="btn-filter-action" style="color: var(--accent); flex:1; text-align: right;">Aplicar Filtros</button>
+                        </div>
+                        <div class="filter-bar">
+                            ${filterItems
+                              .map(
+                                (f) => `
+                                <div class="filter-banner ${activeFilter === f ? "active" : ""}" onclick="toggleDropdown('${f}')">
+                                    ${f} ${activeFilter === f ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline; margin-left:4px;"><path d="M6 15L12 9L18 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline; margin-left:4px;"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'}
+                                </div>
+                            `,
+                              )
+                              .join("")}
+                        </div>
+                        <div style="display:${activeFilter ? "block" : "none"}; border:none; box-shadow:none; padding:15px 20px;">
+                            <p style="font-size:9px; font-weight:900; margin-bottom:10px; text-transform:uppercase;">Filtrar ${activeFilter}:</p>
+                            ${
+                              activeFilter === "Seguidos"
+                                ? `
+                                <div style="overflow-x:auto; display:flex; gap:12px; padding-bottom:10px;">
+                                    ${followedUsers
+                                      .map(
+                                        (user) => `
+                                        <div onclick="toggleUserSelection('${user.handle}')" style="cursor:pointer; text-align:center; flex-shrink:0; width:50px; overflow:hidden;">
+                                            <div style="width:50px; height:50px; background:#111812; border-radius:50%; margin:0 auto 8px; border:${selectedUsers.has(user.handle) ? "3px solid #111812" : "2px solid #ddd"}; display:flex; align-items:center; justify-content:center; color:white; font-weight:900; font-size:24px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                                            <div style="font-size:9px; font-weight:700; text-transform:uppercase;">${user.handle}</div>
+                                            <div style="font-size:9px; color:#666; height: 12px; overflow: hidden;">${user.name}</div>
+                                        </div>
+                                    `,
+                                      )
+                                      .join("")}
+                                </div>
+                            `
+                                : `
+                                <div class="checkbox-group">
+                                    ${
+                                      activeFilter
+                                        ? filters[activeFilter]
+                                            .map(
+                                              (opt) => `
+                                        <div class="checkbox-item"><input type="checkbox"> ${opt}</div>
+                                    `,
+                                            )
+                                            .join("")
+                                        : ""
+                                    }
+                                </div>
+                            `
+                            }
+                        </div>
+                    </div>
+                    ` : ''}
+                    <div style="flex:1; position:relative; z-index:1;">${cardContent}</div>
+                    <div style="display:flex; flex-direction:column; z-index:10;">
+                        <div class="action-bar">
+                            <button class="btn-premium-shadow guardar" style="display:flex; align-items:center; justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 6.2C5 5.07989 5 4.51984 5.21799 4.09202C5.40973 3.71569 5.71569 3.40973 6.09202 3.21799C6.51984 3 7.07989 3 8.2 3H15.8C16.9201 3 17.4802 3 17.908 3.21799C18.2843 3.40973 18.5903 3.71569 18.782 4.09202C19 4.51984 19 5.07989 19 6.2V21L12 16L5 21V6.2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
+                            <button class="btn-premium-shadow dislike" style="display:flex; align-items:center; justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            <button class="btn-premium-shadow like" style="display:flex; align-items:center; justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12.6111L8.92308 17.5L20 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            <button class="btn-premium-shadow ofertar" style="display:flex; align-items:center; justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 8.5V8.35417C18 6.50171 16.4983 5 14.6458 5H9.5C7.567 5 6 6.567 6 8.5C6 10.433 7.567 12 9.5 12H14.5C16.433 12 18 13.567 18 15.5C18 17.433 16.433 19 14.5 19H9.42708C7.53436 19 6 17.4656 6 15.5729V15.5M12 3V21" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
+                        </div>
+                        <nav style="display:flex; justify-content:space-around; align-items:center; border-top:1px solid var(--line); padding:12px 0;">
+                            <button style="border:none; background:rgba(0,0,0,0.1); cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center; border-radius:50%;"><img src="../../assets/house-floor-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button>
+                            <button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/cart-shopping-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button>
+                            <button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/store-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button>
+                            <button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/bell-alt-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button>
+                            <button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/user-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button>
+                        </nav>
+                    </div>`;
+        } else {
+          viewport.innerHTML = `
+                    <header style="justify-content:space-between; padding:20px 40px;">
+                        <div style="font-family:'strelka'; font-weight:700; font-size:20px;">VTRNA.</div>
+                        <nav style="display:flex; gap:30px; align-items:center;">
+                            <button style="border:none; background:rgba(0,0,0,0.1); cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center; border-radius:50%;"><img src="../../assets/house-floor-svgrepo-com.svg" width="20" height="20"/></button>
+                            <button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/cart-shopping-svgrepo-com.svg" width="20" height="20"/></button>
+                            <button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/store-svgrepo-com.svg" width="20" height="20"/></button>
+                            <button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/bell-alt-svgrepo-com.svg" width="20" height="20"/></button>
+                            <button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/user-svgrepo-com.svg" width="20" height="20"/></button>
+                        </nav>
+                    </header>
+                    <div class="desktop-container">
+                        <div class="main-content-push">
+                            <div class="feed-section">
+                                <div class="feed-toggle">
+                                    <span class="${currentFeed === "global" ? "active" : ""}" onclick="toggleFeed('global')">Global</span>
+                                    <span class="${currentFeed === "seguidos" ? "active" : ""}" onclick="toggleFeed('seguidos')">Seguidos</span>
+                                </div>
+                            </div>
+                            <div style="text-align:center; padding:6px 20px; border-bottom:1px solid var(--line); cursor:pointer; font-weight:900; font-size:10px; text-transform:uppercase; display:flex; align-items:center; justify-content:left; gap:8px; position:relative; z-index:101;" onclick="toggleFilter()">
+                                FILTROS
+                                ${filterOpen ? `<img src="../../assets/chevron-up-svgrepo-com.svg" width="14" height="14"/>` : `<img src="../../assets/chevron-down-svgrepo-com.svg" width="14" height="14"/>`}
+                            </div>
+                            ${filterOpen ? `
+                            <div class="filter-container" style="position:absolute; top:145px; left:0; right:0; z-index:100; background: #F8F7F4; border-bottom:1px solid var(--line);">
+                                <div class="filter-header-actions" style="border-bottom:1px solid var(--line); gap:0; padding:6px 20px;">
+                                    <button class="btn-filter-action" style="color: #999; flex:1; text-align: left;">Limpiar</button>
+                                    <button class="btn-filter-action" style="color: var(--accent); flex:1; text-align: right;">Aplicar Filtros</button>
+                                </div>
+                                <div class="filter-bar">
+                                    ${filterItems
+                                      .map(
+                                        (f) => `
+                                        <div class="filter-banner ${activeFilter === f ? "active" : ""}" onclick="toggleDropdown('${f}')">
+                                            ${f} ${activeFilter === f ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline; margin-left:4px;"><path d="M6 15L12 9L18 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline; margin-left:4px;"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'}
+                                        </div>
+                                    `,
+                                      )
+                                      .join("")}
+                                </div>
+                                <div style="display:${activeFilter ? "block" : "none"}; border:none; box-shadow:none; padding:15px 20px;">
+                                    <p style="font-size:9px; font-weight:900; margin-bottom:10px; text-transform:uppercase;">Filtrar ${activeFilter}:</p>
+                                    ${
+                                      activeFilter === "Seguidos"
+                                        ? `
+                                        <div style="overflow-x:auto; display:flex; gap:12px; padding-bottom:10px;">
+                                            ${followedUsers
+                                              .map(
+                                                (user) => `
+                                                <div onclick="toggleUserSelection('${user.handle}')" style="cursor:pointer; text-align:center; flex-shrink:0; width:50px; overflow:hidden;">
+                                                    <div style="width:50px; height:50px; background:#111812; border-radius:50%; margin:0 auto 8px; border:${selectedUsers.has(user.handle) ? "3px solid #111812" : "2px solid #ddd"}; display:flex; align-items:center; justify-content:center; color:white; font-weight:900; font-size:24px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                                                    <div style="font-size:9px; font-weight:700; text-transform:uppercase;">${user.handle}</div>
+                                                    <div style="font-size:9px; color:#666; height: 12px; overflow: hidden;">${user.name}</div>
+                                                </div>
+                                            `,
+                                              )
+                                              .join("")}
+                                        </div>
+                                    `
+                                        : `
+                                        <div class="checkbox-group">
+                                            ${
+                                              activeFilter
+                                                ? filters[activeFilter]
+                                                    .map(
+                                                      (opt) => `
+                                                <div class="checkbox-item"><input type="checkbox"> ${opt}</div>
+                                            `,
+                                                    )
+                                                    .join("")
+                                                : ""
+                                            }
+                                        </div>
+                                    `
+                                    }
+                                </div>
+                            </div>
+                            ` : ''}
+                            <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:100px; background:#f4f4f4; padding:20px; position:relative;">
+                                <button class="btn-premium-shadow dislike" style="width:80px; height:80px; display:flex; align-items:center; justify-content:center;"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                <div style="width:400px; height:550px; position:relative;">${cardContent}</div>
+                                <button class="btn-premium-shadow like" style="width:80px; height:80px; display:flex; align-items:center; justify-content:center;"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12.6111L8.92308 17.5L20 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                            </div>
+                            <div class="action-bar" style="border-top:1px solid var(--line);height:auto;padding: 20px 0px;display:flex;flex-direction:row;justify-content: space-between;/* gap:20px; */width:400px;margin:0 auto;">
+                                <button class="btn-premium-shadow" style="display:flex; align-items:center; justify-content:center; color:#E6A817;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.5 20.5C17.1944 20.5 21 16.6944 21 12C21 7.30558 17.1944 3.5 12.5 3.5C7.80558 3.5 4 7.30558 4 12C4 13.5433 4.41128 14.9905 5.13022 16.238M1.5 15L5.13022 16.238M6.82531 12.3832L5.47107 16.3542L5.13022 16.238" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                <button class="btn-premium-shadow guardar" style="display:flex; align-items:center; justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 6.2C5 5.07989 5 4.51984 5.21799 4.09202C5.40973 3.71569 5.71569 3.40973 6.09202 3.21799C6.51984 3 7.07989 3 8.2 3H15.8C16.9201 3 17.4802 3 17.908 3.21799C18.2843 3.40973 18.5903 3.71569 18.782 4.09202C19 4.51984 19 5.07989 19 6.2V21L12 16L5 21V6.2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
+                                <button class="btn-premium-shadow" style="color: #111812; display:flex; align-items:center; justify-content:center;" onclick="sidebarOpen=true; render()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.01 19V9M12.01 5H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                <button class="btn-premium-shadow ofertar" style="display:flex; align-items:center; justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 8.5V8.35417C18 6.50171 16.4983 5 14.6458 5H9.5C7.567 5 6 6.567 6 8.5C6 10.433 7.567 12 9.5 12H14.5C16.433 12 18 13.567 18 15.5C18 17.433 16.433 19 14.5 19H9.42708C7.53436 19 6 17.4656 6 15.5729V15.5M12 3V21" stroke="currentColor" stroke-width="2" fill="none"/></svg></button>
+                            </div>
+                        </div>
+                        <aside class="sidebar-push ${sidebarOpen ? "open" : ""}">
+                            <div style="padding:40px; width:400px;">
+                                <button onclick="sidebarOpen=false; render()" style="float:right; border:none; background:none; font-weight:900; cursor:pointer; display:flex; gap:8px; align-items:center;">CERRAR <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                                <h2 style="font-weight:900; text-transform:uppercase; margin-top:40px;">Descripción</h2>
+                                <p style="color:#666; margin-top:20px; line-height:1.6;">Chaqueta vintage original de los 90. Cuero sintético en perfecto estado. Sin detalles de uso, calce oversize ideal para capas.</p>
+                            </div>
+                        </aside>
+                    </div>`;
+        }
+      }
+      render();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VTRNA. - Preferencias</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.typekit.net/yhs6ric.css" />
+    <link rel="stylesheet" href="preferences.css" />
+  </head>
+  <body>
+    <div style="margin-bottom: 10px; display: flex; gap: 5px; justify-content: center;">
+      <button onclick="switchMode('mobile')" style="padding: 5px 10px; cursor: pointer;">Mobile</button>
+      <button onclick="switchMode('desktop')" style="padding: 5px 10px; cursor: pointer;">Desktop</button>
+    </div>
+
+    <div id="viewport" class="view-mobile">
+      <header class="preferences-header">
+        <div class="logo" style="font-family: 'strelka', sans-serif; font-weight: 700;">VTRNA.</div>
+        <nav class="nav-top">
+            <button class="nav-btn nav-text" onclick="alert('About Us - Próximamente')">About Us</button>
+          <button class="nav-btn nav-text" onclick="alert('FAQ - Próximamente')">FAQ</button>
+          <button class="nav-btn nav-secondary" onclick="alert('Sign Out - Próximamente')">Sign Out</button>
+        </nav>
+        <button class="nav-menu-btn" onclick="toggleMobileMenu()">
+            <img src="../../assets/menu-svgrepo-com.svg" alt="menu" style="width: 20px; height: 20px;">
+        </button>
+      </header>
+
+      <!-- MOBILE MENU DROPDOWN -->
+      <div id="mobile-menu" class="mobile-menu">
+          <button class="mobile-menu-item nav-text" onclick="alert('About Us - Próximamente'); toggleMobileMenu()">About Us</button>
+          <button class="mobile-menu-item nav-text" onclick="alert('FAQ - Próximamente'); toggleMobileMenu()">FAQ</button>
+          <button class="mobile-menu-item nav-secondary" onclick="alert('Sign Out - Próximamente'); toggleMobileMenu()">Sign Out</button>
+      </div>
+
+      <!-- WELCOME -->
+      <div id="welcome-container" class="welcome-container" >
+        <div class="welcome-content" style="padding:100px 20px; height: 100%; display:flex; flex-direction:column; justify-content:center;">
+          <h1 class="welcome-title" style="font-size:28px; font-weight:900; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; text-align:center;">Welcome</h1>
+          <p class="welcome-subtitle">Cuéntanos tus preferencias</p>
+          <div class="welcome-buttons" style="margin-top:40px;">
+            <button class="btn-empezar" onclick="startForm()">Empezar</button>
+            <button class="btn-omitir" onclick="omitir()">Omitir</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP FORM -->
+      <div id="step-form-container" class="step-form-container" style="display:none;">
+        <div class="step-form-content">
+          <div class="progress-wrapper">
+            <ul class="multi-steps" id="progress-bar">
+              <li></li><li></li><li></li><li></li>
+            </ul>
+          </div>
+          <div class="step-title-bar" id="step-title"></div>
+          <div class="step-content" id="step-content"></div>
+        </div>
+        <div class="step-footer">
+          <button class="btn-secondary" id="btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn-action" id="btn-next" onclick="goNext()">Siguiente</button>
+          <button class="btn-omitir-spacer">Omitir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUMMARY MODAL -->
+    <div id="summary-modal" class="preferences-modal-overlay">
+      <div class="preferences-modal-content">
+        <div class="modal-header">Resumen de Preferencias</div>
+        <div class="modal-body" id="summary-body"></div>
+        <div class="modal-footer">
+          <button class="btn-secondary" onclick="closeSummary()">Editar</button>
+          <button class="btn-action" onclick="confirmar()">Confirmar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OMITIR MODAL -->
+    <div id="omitir-modal" class="preferences-modal-overlay">
+      <div class="preferences-modal-content">
+        <div style="padding: 40px 20px; text-align: center;">
+          <div style="font-size: 64px; margin-bottom: 20px;">
+            <img src="../../assets/done/face-frown-svgrepo-com.svg" alt="sad" style="width: 80px; height: 80px;">
+          </div>
+          <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 10px;">¡Vaya!</h2>
+          <p style="font-size: 14px; color: #666; margin-bottom: 30px;">Has omitido las preferencias.</p>
+          <button class="btn-action" style="width: 100%; padding: 12px;" onclick="cerrarOmitirModal()">Entendido</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIRMAR MODAL -->
+    <div id="confirmar-modal" class="preferences-modal-overlay">
+      <div class="preferences-modal-content">
+        <div style="padding: 40px 20px; text-align: center;">
+          <div style="font-size: 64px; margin-bottom: 20px;">
+            <img src="../../assets/done/face-smile-svgrepo-com.svg" alt="happy" style="width: 80px; height: 80px;">
+          </div>
+          <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 10px;">¡Bienvenido!</h2>
+          <p style="font-size: 14px; color: #666; margin-bottom: 30px;">Preferencias guardadas con éxito.</p>
+          <button class="btn-action" style="width: 100%; padding: 12px;" onclick="cerrarConfirmarModal()">Continuar</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentMode = 'mobile';
+      let currentStep = 1;
+      const TOTAL_STEPS = 4;
+      let metroStations = { lines: [] };
+      let selectedStations = new Set();
+
+      const STEPS_META = [
+        { title: 'Sobre Ti' },
+        { title: 'Tus Estilos' },
+        { title: 'Zonas' },
+        { title: 'Tu Rol' }
+      ];
+
+      const stylesList = ['Vintage','Streetwear','Formal','Casual','Deportivo','Bohemio','Minimalista','Clásico','Urbano','Gótico','Cottagecore','Y2K'];
+      const garmentsList = ['Chaquetas','Pantalones','Camisetas','Vestidos','Faldas','Calzado','Accesorios','Bolsos','Sombreros','Joyería','Abrigos','Tops'];
+      const sizesList = ['XS','S','M','L','XL','XXL','Única'];
+
+      function switchMode(m) {
+        currentMode = m;
+        document.getElementById('viewport').className = m === 'mobile' ? 'view-mobile' : 'view-desktop';
+        // Cerrar menú al cambiar a desktop
+        const menu = document.getElementById('mobile-menu');
+        if (menu) menu.classList.remove('active');
+        document.getElementById('summary-modal').className = m === 'mobile' ? 'preferences-modal-overlay' : 'preferences-modal-overlay view-desktop';
+        document.getElementById('omitir-modal').className = m === 'mobile' ? 'preferences-modal-overlay' : 'preferences-modal-overlay view-desktop';
+        document.getElementById('confirmar-modal').className = m === 'mobile' ? 'preferences-modal-overlay' : 'preferences-modal-overlay view-desktop';
+      }
+
+      function toggleMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        if (menu) {
+          menu.classList.toggle('active');
+        }
+      }
+
+      function startForm() {
+        document.getElementById('welcome-container').style.display = 'none';
+        document.getElementById('step-form-container').style.display = 'flex';
+        currentStep = 1;
+        renderStep();
+        if (metroStations.lines.length === 0) loadMetroStations();
+      }
+
+      function omitir() {
+        document.getElementById('omitir-modal').classList.add('active');
+      }
+
+      function cerrarOmitirModal() {
+        document.getElementById('omitir-modal').classList.remove('active');
+        document.getElementById('step-form-container').style.display = 'none';
+        document.getElementById('welcome-container').style.display = 'flex';
+        currentStep = 1;
+        savedData = {};
+        selectedStations.clear();
+      }
+
+      function confirmar() {
+        document.getElementById('confirmar-modal').classList.add('active');
+        setTimeout(() => {
+          cerrarConfirmarModal();
+        }, 1500);
+      }
+
+      function cerrarConfirmarModal() {
+        document.getElementById('confirmar-modal').classList.remove('active');
+        document.getElementById('step-form-container').style.display = 'none';
+        document.getElementById('summary-modal').classList.remove('active');
+        document.getElementById('welcome-container').style.display = 'flex';
+        currentStep = 1;
+        savedData = {};
+        selectedStations.clear();
+      }
+
+      function goBack() {
+        if (currentStep === 1) {
+          document.getElementById('step-form-container').style.display = 'none';
+          document.getElementById('welcome-container').style.display = 'flex';
+        } else {
+          currentStep--;
+          renderStep();
+        }
+      }
+
+      function goNext() {
+        if (currentStep < TOTAL_STEPS) {
+          currentStep++;
+          renderStep();
+        } else {
+          showSummary();
+        }
+      }
+
+      function updateProgress() {
+        const items = document.querySelectorAll('#progress-bar li');
+        items.forEach((li, i) => {
+          li.className = '';
+          if (i < currentStep - 1) li.className = 'done';
+          else if (i === currentStep - 1) li.className = 'is-active';
+          else li.className = 'pending';
+        });
+        document.getElementById('step-title').textContent = STEPS_META[currentStep - 1].title;
+        const btnNext = document.getElementById('btn-next');
+        btnNext.textContent = currentStep === TOTAL_STEPS ? 'Ver Resumen' : 'Siguiente';
+        const btnBack = document.getElementById('btn-back');
+        btnBack.textContent = currentStep === 1 ? 'Cancelar' : 'Atrás';
+      }
+
+      function renderStep() {
+        updateProgress();
+        const content = document.getElementById('step-content');
+        if (currentStep === 1) content.innerHTML = renderStep1();
+        else if (currentStep === 2) content.innerHTML = renderStep2();
+        else if (currentStep === 3) content.innerHTML = renderStep3();
+        else if (currentStep === 4) content.innerHTML = renderStep4();
+        attachTokenListeners();
+        if (currentStep === 2) attachTokenListeners();
+        if (currentStep === 3 && metroStations.lines.length > 0) renderMetroLines();
+      }
+
+      function renderStep1() {
+        return `
+          <div class="sign-up-form-group">
+            <div class="sign-up-form-label">Género</div>
+            <div style="display:grid; grid-template-columns: repeat(2,1fr); gap:6px;">
+              ${['Mujer','Hombre','Otro','Prefiero no decirlo'].map(v => `
+                <label class="sign-up-form-option">
+                  <input type="radio" name="gender" value="${v}" style="display:none;" ${savedData.gender===v?'checked':''} />
+                  <div class="sign-up-form-option-label">${v}</div>
+                </label>`).join('')}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Edad</label>
+            <input type="number" id="edad-input" class="form-input" placeholder="Ej: 25" min="18" max="100" value="${savedData.edad||''}" />
+          </div>`;
+      }
+
+      function renderStep2() {
+        return `
+          <div class="sign-up-form-group">
+            <div class="sign-up-form-label">¿Qué tipo de ropa buscas?</div>
+            <div style="display:flex; gap:6px;">
+              ${['Mujer','Hombre','Ambos'].map(v => `
+                <label class="sign-up-form-option">
+                  <input type="radio" name="clothType" value="${v}" style="display:none;" ${savedData.clothType===v?'checked':''} />
+                  <div class="sign-up-form-option-label">${v}</div>
+                </label>`).join('')}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Estilos que te Interesan</label>
+            <div class="token-group" id="styles-token-group">${buildTokens('styles-token-group', stylesList, savedData.estilos||[], 4)}</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipos de Prendas</label>
+            <div class="token-group" id="garment-token-group">${buildTokens('garment-token-group', garmentsList, savedData.prendas||[], 4)}</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tallas que usas</label>
+            <div class="token-group" id="size-token-group">${buildTokens('size-token-group', sizesList, savedData.tallas||[], 7)}</div>
+          </div>`;
+      }
+
+      function renderStep3() {
+        const pillsHTML = Array.from(selectedStations).map(s =>
+          `<span style="display:inline-flex;align-items:center;gap:5px;background:#111812;color:white;padding:4px 8px;border-radius:3px;font-size:10px;font-weight:700;" data-station="${s}">
+            ${s}<button style="background:none;border:none;color:white;cursor:pointer;font-size:12px;" onclick="removeStation('${s}')">×</button>
+          </span>`).join('');
+        return `
+          <div class="form-group">
+            <span class="form-label">Estaciones de Metro</span>
+            <div id="selected-stations" style="display:flex;flex-wrap:wrap;gap:5px;padding:8px;border:1px solid #ddd;border-radius:4px;margin-bottom:8px;min-height:35px;background:#fafafa;">${pillsHTML}</div>
+            <input type="text" class="form-input" id="search-metro" placeholder="Buscar estación..." oninput="filterStations(this.value)" style="margin-bottom:8px;" />
+            <div id="metro-lines-container" class="metro-container">
+              <div style="padding:10px;">Cargando estaciones...</div>
+            </div>
+          </div>`;
+      }
+
+      function renderStep4() {
+        return `
+          <div class="form-group" style="border-bottom:none;">
+            <label class="form-label">¿Qué quieres hacer en VTRNA.?</label>
+            ${[
+              ['Comprar y Vender','Busca piezas y vende lo que no usas'],
+              ['Solo Comprar','Explora y compra prendas únicas'],
+              ['Solo Vender','Vende tus prendas a otros usuarios'],
+              ['Solo Mirar','Explora sin comprar ni vender']
+            ].map(([val,desc]) => `
+              <label class="role-option">
+                <input type="radio" name="activity" value="${val}" style="margin-top:3px;" ${savedData.actividad===val?'checked':''} />
+                <div>
+                  <div style="font-weight:700;font-size:11px;">${val}</div>
+                  <div style="font-size:10px;color:#666;">${desc}</div>
+                </div>
+              </label>`).join('')}
+          </div>`;
+      }
+
+      function buildTokens(id, items, selected, limit) {
+        const visible = items.slice(0, limit);
+        const hidden = items.slice(limit);
+        let html = visible.map(item =>
+          `<div class="token${selected.includes(item)?' selected':''}" data-value="${item}">${item}</div>`
+        ).join('');
+        if (hidden.length > 0) {
+          html += `<div class="token expand-btn" data-action="expand" data-target="${id}">Ver más</div>`;
+          html += hidden.map(item =>
+            `<div class="token hidden-token${selected.includes(item)?' selected':''}" data-value="${item}" style="display:none;">${item}</div>`
+          ).join('');
+          html += `<div class="token collapse-btn" data-action="collapse" data-target="${id}" style="display:none;">Ver menos</div>`;
+        }
+        return html;
+      }
+
+      function attachTokenListeners() {
+        document.querySelectorAll('.token:not(.expand-btn):not(.collapse-btn)').forEach(t => {
+          t.onclick = function() { this.classList.toggle('selected'); };
+        });
+        document.querySelectorAll('.expand-btn').forEach(btn => {
+          btn.onclick = function() {
+            const c = document.getElementById(this.dataset.target);
+            c.querySelectorAll('.hidden-token').forEach(t => t.style.display = '');
+            this.style.display = 'none';
+            const col = c.querySelector('.collapse-btn');
+            if (col) col.style.display = '';
+          };
+        });
+        document.querySelectorAll('.collapse-btn').forEach(btn => {
+          btn.onclick = function() {
+            const c = document.getElementById(this.dataset.target);
+            c.querySelectorAll('.hidden-token').forEach(t => t.style.display = 'none');
+            this.style.display = 'none';
+            const exp = c.querySelector('.expand-btn');
+            if (exp) exp.style.display = '';
+          };
+        });
+      }
+
+      function getSelectedTokens(id) {
+        const c = document.getElementById(id);
+        if (!c) return [];
+        return Array.from(c.querySelectorAll('.token.selected:not(.expand-btn):not(.collapse-btn)')).map(t => t.dataset.value || t.innerText);
+      }
+
+      function getRadio(name) {
+        const r = document.querySelector(`input[name="${name}"]:checked`);
+        return r ? r.value : null;
+      }
+
+      // Save state before navigating
+      let savedData = {};
+      function saveCurrentStep() {
+        if (currentStep === 1) {
+          savedData.gender = getRadio('gender');
+          savedData.edad = document.getElementById('edad-input')?.value || '';
+        } else if (currentStep === 2) {
+          savedData.clothType = getRadio('clothType');
+          savedData.estilos = getSelectedTokens('styles-token-group');
+          savedData.prendas = getSelectedTokens('garment-token-group');
+          savedData.tallas = getSelectedTokens('size-token-group');
+        } else if (currentStep === 4) {
+          savedData.actividad = getRadio('activity');
+        }
+      }
+
+      const origGoBack = goBack;
+      const origGoNext = goNext;
+      window.goBack = function() { saveCurrentStep(); origGoBack(); };
+      window.goNext = function() { saveCurrentStep(); origGoNext(); };
+
+      // METRO
+      async function loadMetroStations() {
+        try {
+          const r = await fetch('metro-stations.json');
+          metroStations = await r.json();
+          if (currentStep === 3) renderMetroLines();
+        } catch(e) {
+          const c = document.getElementById('metro-lines-container');
+          if (c) c.innerHTML = '<div style="padding:10px;">Error al cargar estaciones</div>';
+        }
+      }
+
+      function renderMetroLines() {
+        const c = document.getElementById('metro-lines-container');
+        if (!c || !metroStations.lines) return;
+        let html = '';
+        metroStations.lines.forEach((line, idx) => {
+          html += `<div>
+            <div class="metro-line-header" onclick="toggleMetroLine(${idx})">
+              <span><img src="../../assets/map-pin-alt-svgrepo-com.svg" alt="ubicacion" style="width:12px; height:12px; display:inline-block; margin-right:6px;">Línea ${line.number}</span>
+              <span class="toggle-icon-${idx}"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+            </div>
+            <div class="metro-line-content-${idx}" style="padding:4px 10px; display:${idx===0?'block':'none'};">
+              ${line.stations.map(s => `
+                <label class="metro-station-label">
+                  <input type="checkbox" class="metro-cb" data-station="${s}" onchange="toggleStation(this)" ${selectedStations.has(s)?'checked':''} />
+                  ${s}
+                </label>`).join('')}
+            </div>
+          </div>`;
+        });
+        c.innerHTML = html;
+      }
+
+      window.toggleMetroLine = function(idx) {
+        const content = document.querySelector(`.metro-line-content-${idx}`);
+        const icon = document.querySelector(`.toggle-icon-${idx}`);
+        if (content) {
+          const hidden = content.style.display === 'none';
+          content.style.display = hidden ? 'block' : 'none';
+          if (icon) icon.innerHTML = hidden ? '<img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/>' : '<img src="../../assets/chevron-up-svgrepo-com.svg" width="16" height="16"/>';
+        }
+      };
+
+      window.toggleStation = function(cb) {
+        if (cb.checked) selectedStations.add(cb.dataset.station);
+        else selectedStations.delete(cb.dataset.station);
+        updatePills();
+      };
+
+      window.removeStation = function(station) {
+        selectedStations.delete(station);
+        const cb = document.querySelector(`.metro-cb[data-station="${station}"]`);
+        if (cb) cb.checked = false;
+        updatePills();
+      };
+
+      function updatePills() {
+        const c = document.getElementById('selected-stations');
+        if (!c) return;
+        c.innerHTML = Array.from(selectedStations).map(s =>
+          `<span style="display:inline-flex;align-items:center;gap:5px;background:#111812;color:white;padding:4px 8px;border-radius:3px;font-size:10px;font-weight:700;">
+            ${s}<button style="background:none;border:none;color:white;cursor:pointer;font-size:12px;" onclick="removeStation('${s}')">×</button>
+          </span>`).join('');
+      }
+
+      window.filterStations = function(query) {
+        const q = query.toLowerCase();
+        document.querySelectorAll('#metro-lines-container > div').forEach(line => {
+          const labels = line.querySelectorAll('label');
+          let match = false;
+          labels.forEach(lbl => {
+            const show = lbl.textContent.trim().toLowerCase().includes(q);
+            lbl.style.display = show ? 'block' : 'none';
+            if (show) match = true;
+          });
+          line.style.display = (q === '' || match) ? 'block' : 'none';
+        });
+      };
+
+      // SUMMARY
+      function showSummary() {
+        saveCurrentStep();
+        const gender = savedData.gender || 'No especificado';
+        const edad = savedData.edad ? savedData.edad + ' años' : '—';
+        const clothType = savedData.clothType || 'No especificado';
+        const estilos = savedData.estilos?.length ? savedData.estilos.join(', ') : 'Ninguno';
+        const prendas = savedData.prendas?.length ? savedData.prendas.join(', ') : 'Ninguno';
+        const tallas = savedData.tallas?.length ? savedData.tallas.join(', ') : 'Ninguna';
+        const estaciones = selectedStations.size ? Array.from(selectedStations).join(', ') : 'Ninguna';
+        const actividad = savedData.actividad || 'No seleccionado';
+
+        document.getElementById('summary-body').innerHTML = `
+          <div style="padding:15px; background: #F8F7F4; border-radius:8px; text-align:center;">
+            <div style="width:80px; height:80px; margin:0 auto 10px; background: #F8F7F4; border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid black;">
+              <img src="../../assets/user-svgrepo-com.svg" alt="user" style="width:40px; height:40px;">
+            </div>
+            <div style="font-weight:700; font-size:15px; display:flex; align-items:center; justify-content:center;">
+              <img src="../../assets/email-svgrepo-com.svg" alt="email" style="width:20px; height:20px;">
+              tunombre
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-around; gap:8px; margin-bottom:12px; padding:10px 8px; background:#f8f8f8; border-radius:6px;">
+            <div style="text-align:center; font-size:10px; flex:1;">
+              <div style="margin-bottom:4px;"><img src="../../assets/mail-alt-svgrepo-com.svg" alt="email" style="width:16px; height:16px; display:inline-block;"></div>
+              <div style="color:#333; font-weight:600;">-</div>
+            </div>
+            <div style="border-left:1px solid #ddd;"></div>
+            <div style="text-align:center; font-size:10px; flex:1;">
+              <div style="margin-bottom:4px;"><img src="../../assets/birthday-cake-svgrepo-com.svg" alt="edad" style="width:16px; height:16px; display:inline-block;"></div>
+              <div style="color:#333; font-weight:600;">${edad}</div>
+            </div>
+            <div style="border-left:1px solid #ddd;"></div>
+            <div style="text-align:center; font-size:10px; flex:1;">
+              <div style="margin-bottom:4px;"><img src="../../assets/genders-svgrepo-com.svg" alt="genero" style="width:16px; height:16px; display:inline-block;"></div>
+              <div style="color:#333; font-weight:600;">${gender}</div>
+            </div>
+            
+          </div>
+
+          <div style="padding:12px; background: #F8F7F4; border-radius:8px; border:1px solid #E0E0E0; margin-bottom:12px;">
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px; color:#999; font-size:9px; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
+              <img src="../../assets/setting-config-svgrepo-com.svg" alt="pref" style="width:12px; height:12px;">
+              Mis Preferencias
+            </div>
+            <div style="display:flex; flex-direction:column; gap:5px; font-size:10px;">
+                <div style="display:flex; justify-content:space-between; gap:8px;">
+                <span style="color:#666;">Ropa para:</span>
+                <span style="font-weight:700; text-align:right;">-</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; gap:8px;">
+                <span style="color:#666;">Estilos:</span>
+                <span style="font-weight:700; text-align:right;">${estilos}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; gap:8px;">
+                <span style="color:#666;">Prendas:</span>
+                <span style="font-weight:700; text-align:right;">${prendas}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; gap:8px;">
+                <span style="color:#666;">Tallas:</span>
+                <span style="font-weight:700; text-align:right;">${tallas}</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:10px 12px; background: #F8F7F4; border-radius:8px; border:1px solid #E0E0E0; margin-bottom:12px;">
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px; color:#999; font-size:9px; font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">
+              <img src="../../assets/map-pin-alt-svgrepo-com.svg" alt="zonas" style="width:12px; height:12px;">
+              Zonas
+            </div>
+            <div style="font-size:10px; font-weight:700; color:#333;">${estaciones}</div>
+          </div>
+
+          <div style="padding:10px 12px; background: #F8F7F4; border-radius:8px; border:1px solid #E0E0E0;">
+            <div style="display:flex; align-items:center; gap:6px; font-size:10px;">
+              <img src="../../assets/user-lock-svgrepo-com.svg" alt="rol" style="width:12px; height:12px;">
+              <span style="font-weight:700;">${actividad}</span>
+            </div>
+          </div>`;
+
+        document.getElementById('summary-modal').classList.add('active');
+        
+        // Mark all progress steps as done
+        const items = document.querySelectorAll('#progress-bar li');
+        items.forEach((li) => {
+          li.className = 'done';
+        });
+      }
+
+      window.closeSummary = function() {
+        document.getElementById('summary-modal').classList.remove('active');
+      };
+    </script>
+  </body>
+</html>

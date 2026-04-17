@@ -1,0 +1,1828 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VTRNA. - Mis Ventas v4.0</title>
+    <link
+      rel="preconnect" href="https://fonts.googleapis.com"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://use.typekit.net/yhs6ric.css" />
+    <link rel="stylesheet" href="mis-ventas.css" />
+  </head>
+  <body>
+    <div style="margin-bottom: 10px; display: flex; gap: 5px">
+      <button
+        onclick="switchMode('mobile')"
+        style="padding: 5px 10px; cursor: pointer"
+      >
+        Mobile
+      </button>
+      <button
+        onclick="switchMode('desktop')"
+        style="padding: 5px 10px; cursor: pointer"
+      >
+        Desktop
+      </button>
+    </div>
+
+    <div id="viewport" class="view-mobile"></div>
+
+    <!-- MODALES DE ÉXITO -->
+    <div id="modal-success-created" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" style="padding: 40px 20px; text-align: center; max-width: 400px;" onclick="event.stopPropagation()">
+        <div style="font-size: 64px; margin-bottom: 20px;">
+          <img src="../../assets/done/face-smile-svgrepo-com.svg" alt="success" style="width: 80px; height: 80px;">
+        </div>
+        <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 10px;">¡Publicación Creada!</h2>
+        <p style="font-size: 12px; color: #666; margin-bottom: 20px;">Tu prenda ya está visible para otros usuarios.</p>
+        <button class="btn-action" style="width: 100%; padding: 12px;" onclick="closeModals()">Continuar</button>
+      </div>
+    </div>
+
+    <div id="modal-success-sold" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" style="padding: 40px 20px; text-align: center; max-width: 400px;" onclick="event.stopPropagation()">
+        <div style="font-size: 64px; margin-bottom: 20px;">
+          <img src="../../assets/check-svgrepo-com.svg" alt="success" style="width: 80px; height: 80px;">
+        </div>
+        <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 10px;">¡Venta Finalizada!</h2>
+        <p style="font-size: 12px; color: #666; margin-bottom: 20px;">La transacción ha sido completada exitosamente.</p>
+        <button class="btn-action" style="width: 100%; padding: 12px;" onclick="closeModals()">Continuar</button>
+      </div>
+    </div>
+
+    <div id="modal-success-offer-accepted" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" style="padding: 40px 20px; text-align: center; max-width: 400px;" onclick="event.stopPropagation()">
+        <div style="font-size: 64px; margin-bottom: 20px;">
+          <img src="../../assets/handshake-svgrepo-com.svg" alt="success" style="width: 80px; height: 80px;">
+        </div>
+        <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 10px;">¡Oferta Aceptada!</h2>
+        <p style="font-size: 12px; color: #666; margin-bottom: 20px;">Se ha confirmado la oferta. Procede con la transacción.</p>
+        <button class="btn-action" style="width: 100%; padding: 12px;" onclick="closeModals()">Continuar</button>
+      </div>
+    </div>
+
+    <div id="modal-success-deleted" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" style="padding: 40px 20px; text-align: center; max-width: 400px;" onclick="event.stopPropagation()">
+        <div style="font-size: 64px; margin-bottom: 20px;">
+          <img src="../../assets/trash-list-svgrepo-com.svg" alt="success" style="width: 80px; height: 80px;">
+        </div>
+        <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 10px;">Publicación Eliminada</h2>
+        <p style="font-size: 12px; color: #666; margin-bottom: 20px;">La publicación ha sido removida exitosamente.</p>
+        <button class="btn-action" style="width: 100%; padding: 12px;" onclick="closeModals()">Continuar</button>
+      </div>
+    </div>
+
+    <div id="modal-confirm-delivery" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" style="padding: 40px 20px; text-align: center; max-width: 400px;" onclick="event.stopPropagation()">
+        <h3 style="font-weight: 900; text-transform: uppercase; font-size: 16px; margin-bottom: 15px;">¿Confirmar Entrega?</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 30px;">Una vez confirmado, la venta se cierra.</p>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-secondary" style="flex: 1; padding: 12px;" onclick="closeModals()">No, Cancelar</button>
+          <button class="btn-action" style="flex: 1; padding: 12px;" onclick="confirmDelivery()">Sí, Confirmar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL CREAR PUBLICACIÓN CON BARRA DE PROGRESO -->
+    <div id="modal-create" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" id="modal-create-content" onclick="event.stopPropagation()"></div>
+    </div>
+
+    <!-- MODAL EDITAR PUBLICACIÓN -->
+    <div id="modal-edit" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" id="modal-edit-content" onclick="event.stopPropagation()"></div>
+    </div>
+
+    <div id="modal-view-static" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div
+          style="
+            padding: 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 12px;
+          "
+        >
+          Detalles de la Prenda
+        </div>
+        <div style="height: 350px; overflow-y: auto">
+          <!-- Layout: Foto a izquierda + Info a derecha (mismo que preview desktop) -->
+          <div style="display:grid; grid-template-columns:200px 1fr; gap:20px; padding:16px;">
+            <!-- Foto principal -->
+            <div>
+              <div style="aspect-ratio:3/4; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px; margin-bottom:12px;"></div>
+              <button id="toggle-photos-btn-static" class="btn-secondary" style="width:100%; padding:8px; font-size:10px; font-weight:700; cursor:pointer;" onclick="toggleMorePhotosStatic()">Ver más fotos</button>
+            </div>
+            
+            <!-- Info al lado -->
+            <div>
+              <!-- Título -->
+              <h3 style="margin:0 0 16px 0; font-size:18px; font-weight:700;">Vintage 90s Jacket Premium</h3>
+              
+              <!-- Precio -->
+              <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--line);">
+                <div style="font-size:24px; font-weight:900; color:var(--accent);">$25.000</div>
+                <div style="font-size:12px; color:#666; display:flex; align-items:center; gap:4px;"><img src="../../assets/handshake-svgrepo-com.svg" width="14" height="14"/> Negociable</div>
+              </div>
+              
+              <!-- Categoría + Especificaciones en grilla -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div>
+                  <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Categoría</div>
+                  <div style="font-size:13px; font-weight:600;">Streetwear</div>
+                  <div style="font-size:12px; color:#666;">Negro</div>
+                </div>
+                <div>
+                  <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Especificaciones</div>
+                  <div style="font-size:13px; font-weight:600;">Hombre</div>
+                  <div style="font-size:12px; color:#666;">Talla M · Usado buen estado</div>
+                </div>
+              </div>
+              
+              <!-- Ubicación -->
+              <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--line);">
+                <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Ubicación</div>
+                <div style="font-size:12px; display:flex; align-items:center; gap:6px;"><img src="../../assets/map-pin-alt-svgrepo-com.svg" width="14" height="14"/> Línea 1, Los Leones</div>
+              </div>
+              
+              <!-- Descripción -->
+              <div style="margin-top:12px;">
+                <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Descripción</div>
+                <p style="margin:0; font-size:12px; line-height:1.6; color:#555;">Chaqueta vintage en excelente estado, sin defectos. Poco uso, prácticamente nueva. Marca original, muy cómoda y versátil.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Galería de más fotos (oculta por defecto) -->
+          <div id="more-photos-gallery-static" style="display:none; grid-template-columns:repeat(6, 1fr); gap:12px; padding:16px; border-top:1px solid var(--line);">
+            <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+            <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+          </div>
+        </div>
+        <div style="padding:15px; display:flex; gap:10px; border-top:1px solid var(--line);">
+          <button class="btn-secondary" style="width: 100%; padding: 12px;" onclick="closeModals()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-sale-info" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" id="modal-sale-info-content" onclick="event.stopPropagation()"></div>
+    </div>
+
+    <div id="modal-offer-accepted-detail" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div style="padding: 15px; font-weight: 900; text-transform: uppercase; font-size: 12px; border-bottom: 1px solid var(--line);">Oferta Aceptada</div>
+        <div style="padding: 15px; max-height: 500px; overflow-y: auto;" id="offer-accepted-content"></div>
+        <div style="padding: 15px; display: flex; gap: 10px; border-top: 1px solid var(--line);">
+          <button class="btn-secondary" style="flex: 1; padding: 12px;" onclick="closeModals();">Cerrar</button>
+          <button class="btn-action" style="flex: 1; padding: 12px;" onclick="closeModals(); document.getElementById('modal-confirm-delivery').classList.add('active');">Confirmar Entrega</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-view-offers" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div style="padding: 15px; font-weight: 900; text-transform: uppercase; font-size: 12px; border-bottom: 1px solid var(--line);">Ofertas</div>
+        <div style="padding: 15px 0px; max-height: 550px; overflow-y: auto;" id="offers-content"></div>
+        <div style="padding: 15px; border-top: 1px solid var(--line);">
+          <button class="btn-secondary" style="width: 100%; padding: 10px;" onclick="closeModals();">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-delete" class="modal-overlay" onclick="closeModals()">
+      <div
+        class="modal-content"
+        style="padding: 40px 20px; text-align: center; max-width: 400px;"
+        onclick="event.stopPropagation()"
+      >
+        <h3
+          style="
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 16px;
+            margin-bottom: 15px;
+          "
+        >
+          ¿Eliminar Publicación?
+        </h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 30px">
+          Esta acción no se puede deshacer.
+        </p>
+        <div style="display: flex; gap: 10px;">
+          <button
+            class="btn-secondary"
+            style="flex: 1; padding: 12px;"
+            onclick="closeModals()"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn-danger"
+            style="flex: 1; padding: 12px;"
+            onclick="closeModals(); document.getElementById('modal-success-deleted').classList.add('active');"
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="modal-actions-compact"
+      class="modal-overlay"
+      onclick="closeModals()"
+    >
+      <div
+        class="modal-content"
+        style="width: 280px"
+        onclick="event.stopPropagation()"
+      >
+        <div
+          style="
+            padding: 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 12px;
+          "
+        >
+          Acciones
+        </div>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 10px;
+          "
+          id="compact-actions-container"
+        ></div>
+        <div style="padding-top:5px; border-top:1px solid var(--line); margin:0 10px; display:flex; flex-direction:column; gap:10px; padding-top:10px; padding-bottom:10px;">
+          <button
+            onclick="closeModals()"
+            class="btn-secondary"
+            style="width: 100%; padding: 12px;"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentMode = "mobile";
+      let currentView = "list";
+      let currentTab = "activas";
+      let createStep = 1;
+      let metroStations = {}; // Almacenar datos de metros
+
+      // Cargar estaciones de metro
+      async function loadMetroStations() {
+        try {
+          const response = await fetch('metro-stations.json');
+          metroStations = await response.json();
+          generateMetroSelectors(); // Generar selectores después de cargar
+        } catch (error) {
+          console.error('Error cargando estaciones de metro:', error);
+          // Fallback si hay error
+          metroStations = { lines: [] };
+        }
+      }
+
+      function generateMetroSelectors() {
+        // Generar selector del paso 5 (Crear)
+        const container5 = document.getElementById('metro-lines-5');
+        if (container5) {
+          container5.innerHTML = generateMetroHTML('5');
+          // Attach event listeners for create form checkboxes
+          attachMetroCheckboxListeners('metro-station', 'selected-stations-5');
+        }
+        // Generar selector del modal de editar
+        const containerEdit = document.getElementById('metro-lines-edit');
+        if (containerEdit) {
+          containerEdit.innerHTML = generateMetroHTML('edit');
+          // Attach event listeners for edit modal checkboxes
+          attachMetroCheckboxListeners('metro-station-edit', 'selected-stations-edit');
+        }
+      }
+
+      function attachMetroCheckboxListeners(checkboxClass, containerId) {
+        const container = document.getElementById(containerId);
+        const checkboxes = document.querySelectorAll(`.${checkboxClass}`);
+        
+        checkboxes.forEach(checkbox => {
+          // Handle initial state if checked
+          if (checkbox.checked) {
+            addStationPill(checkbox.dataset.station, containerId);
+          }
+          
+          // Add change listener
+          checkbox.addEventListener('change', function() {
+            if (this.checked) {
+              addStationPill(this.dataset.station, containerId);
+            } else {
+              removeStationPill(this.dataset.station, containerId);
+            }
+          });
+        });
+      }
+
+      function addStationPill(station, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        // Avoid duplicates
+        const existing = Array.from(container.querySelectorAll('span')).find(s => s.textContent.includes(station.split(',')[1]));
+        if (existing) return;
+        
+        const pill = document.createElement('span');
+        pill.style.cssText = 'display: inline-flex; align-items: center; gap: 5px; background: #111812; color: white; padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 700;';
+        pill.dataset.station = station;
+        pill.innerHTML = `${station.split(',')[1]}
+          <button style="background: none; border: none; color: white; cursor: pointer; font-size: 12px;" onclick="removePillAndUncheck(this)">×</button>`;
+        container.appendChild(pill);
+      }
+
+      function removeStationPill(station, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        const pill = Array.from(container.querySelectorAll('span')).find(s => s.dataset.station === station);
+        if (pill) pill.remove();
+      }
+
+      function removePillAndUncheck(btn) {
+        const pill = btn.closest('span');
+        const station = pill.dataset.station;
+        const container = pill.closest('.form-group') || pill.closest('div[id*="selected"]');
+        
+        // Find the checkbox that corresponds to this station
+        let checkboxes;
+        if (container.id.includes('edit')) {
+          checkboxes = document.querySelectorAll('.metro-station-edit[data-station="' + station + '"]');
+        } else {
+          checkboxes = document.querySelectorAll('.metro-station[data-station="' + station + '"]');
+        }
+        
+        checkboxes.forEach(cb => {
+          cb.checked = false;
+          cb.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        
+        pill.remove();
+      }
+
+      function generateMetroHTML(suffix) {
+        if (!metroStations.lines || metroStations.lines.length === 0) return '';
+        
+        // Determine class names and handlers based on suffix
+        const lineContentClass = suffix === 'edit' ? 'line-content-edit' : 'line-content';
+        const metroStationClass = suffix === 'edit' ? 'metro-station-edit' : 'metro-station';
+        const toggleHandler = suffix === 'edit' ? 'toggleLineEdit(this)' : 'toggleLine(this)';
+        
+        return metroStations.lines.map(line => `
+          <div style="border-bottom: 1px solid #eee;">
+            <div onclick="${toggleHandler}" style="font-weight: 900; cursor: pointer; padding: 10px; background: #f9f9f9; user-select: none; display: flex; justify-content: space-between; align-items: center;">
+              <span style="display:flex; align-items:center; gap:4px;"><img src="../../assets/map-pin-alt-svgrepo-com.svg" width="12" height="12"/> Línea ${line.number}</span>
+              <img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16" class="line-arrow"/>
+            </div>
+            <div class="${lineContentClass}" style="padding: 8px 10px; display: ${suffix === '5' && line.number === '1' ? 'block' : 'none'};">
+              ${line.stations.map(station => `
+                <label style="display: block; font-size: 10px; padding: 4px 0;">
+                  <input type="checkbox" class="${metroStationClass}" data-station="Línea ${line.number},${station}" ${line.number === '1' && station === 'Los Leones' ? 'checked' : ''} />
+                  ${station}
+                </label>
+              `).join('')}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Llamar al cargar la página
+      document.addEventListener('DOMContentLoaded', loadMetroStations);
+
+      function switchMode(m) {
+        currentMode = m;
+        const viewport = document.getElementById("viewport");
+        viewport.className = m === "mobile" ? "view-mobile" : "view-desktop";
+        // Agrega o quita la clase 'desktop-mode' en el body
+        if (m === "desktop") document.body.classList.add("desktop-mode");
+        else document.body.classList.remove("desktop-mode");
+        // Forzar reconstrucción del modal de crear para que se adapte
+        if (document.getElementById("modal-create").classList.contains("active")) {
+            renderCreateModal();
+        }
+        // Forzar reconstrucción del modal de editar para que se adapte
+        if (document.getElementById("modal-edit").classList.contains("active")) {
+            renderEditModal();
+        }
+        render();
+    }
+
+      function setView(v) {
+        currentView = v;
+        render();
+      }
+      function setTab(t) {
+        currentTab = t;
+        render();
+      }
+      function closeModals() {
+        document
+          .querySelectorAll(".modal-overlay")
+          .forEach((m) => m.classList.remove("active"));
+      }
+
+      function confirmDelivery() {
+        document.getElementById('modal-confirm-delivery').classList.remove('active');
+        document.getElementById('modal-success-sold').classList.add('active');
+      }
+
+      // OFERTAS DATA
+      const offersData = [
+        { id: 1, user: '@flore_vibe', price: 15000, dateOffer: '31 MAR', channels: ['whatsapp', 'instagram'], phone: '+56 9 9876 5432' },
+        { id: 2, user: '@style_hunter', price: 18500, dateOffer: '02 ABR', channels: ['whatsapp'], phone: '+56 9 8765 4321' },
+        { id: 3, user: '@vintage_collector', price: 20000, dateOffer: '03 ABR', channels: ['instagram', 'mail'], email: 'collector@email.com' }
+      ];
+
+      const buyerData = { user: '@comprador_fijo', price: 16000, phone: '+56 9 1234 5678', instagram: '@usuario_instagram', dateOffer: 'Oferta enviada: 15 Feb', dateAccepted: 'Oferta aceptada: 20 Feb', channels: ['whatsapp', 'instagram'] };
+
+      let offersCurrentLayout = 1;
+      let offerAcceptedCurrentLayout = 1;
+
+      function getChannelIcon(channel) {
+        const iconMap = {
+          'whatsapp': '../../assets/Communication/whatsapp-svgrepo-com.svg',
+          'instagram': '../../assets/Communication/instagram-svgrepo-com.svg',
+          'facebook': '../../assets/Communication/facebook-svgrepo-com.svg',
+          'phone': '../../assets/Communication/phone-svgrepo-com.svg',
+          'mail': '../../assets/mail-alt-svgrepo-com.svg',
+          'circle-dollar': '../../assets/circle-dollar-svgrepo-com.svg'
+        };
+        return iconMap[channel] || '';
+      }
+
+      function switchOffersLayout(layout) {
+        offersCurrentLayout = layout;
+        renderOffersContent();
+        // Update button styles
+        document.querySelectorAll('#offers-layout-btn-1, #offers-layout-btn-2, #offers-layout-btn-3').forEach((btn, i) => {
+          if (i + 1 === layout) {
+            btn.style.background = '#111812';
+            btn.style.color = 'white';
+          } else {
+            btn.style.background = '#F8F7F4';
+            btn.style.color = 'var(--text-main)';
+          }
+        });
+      }
+
+      function switchOfferAcceptedLayout(layout) {
+        offerAcceptedCurrentLayout = layout;
+        renderOfferAcceptedContent();
+        // Update button styles
+        document.querySelectorAll('#layout-btn-1, #layout-btn-2, #layout-btn-3').forEach((btn, i) => {
+          if (i + 1 === layout) {
+            btn.style.background = '#111812';
+            btn.style.color = 'white';
+          } else {
+            btn.style.background = '#F8F7F4';
+            btn.style.color = 'var(--text-main)';
+          }
+        });
+      }
+
+      function renderOffersContent() {
+        const container = document.getElementById('offers-content');
+        
+        // Layout 1: Circular avatar LEFT, monto azul, info RIGHT, botones debajo
+        const html = offersData.map(offer => `
+          <div style="padding: 15px; border-bottom: 1px solid #e0e0e0;">
+            <div style="display: flex; gap: 15px; align-items: flex-start; margin-bottom: 8px;">
+              <img src="../../assets/user-svgrepo-com.svg" style="width: 70px; height: 70px; border-radius: 50%; border: 3px solid #ddd; flex-shrink: 0; object-fit: cover; padding: 8px; background: #F8F7F4;" alt="user" />
+              <div style="flex: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                  <div>
+                    <b style="font-size: 12px; display: block; margin-bottom: 3px;">${offer.user}</b>
+                    <div style="font-size: 9px; color: #666; display: flex; align-items: center; gap: 4px;">
+                      <img src="../../assets/calendar-alt-svgrepo-com.svg" style="width: 12px; height: 12px;" alt="date" />
+                      ${offer.dateOffer}
+                    </div>
+                  </div>
+                  <div style="text-align: right;">
+                    <b style="font-size: 20px; font-weight: 900; color: var(--accent);">$${offer.price.toLocaleString()}</b>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  ${offer.channels.map(ch => `<img src="${getChannelIcon(ch)}" style="width: 16px; height: 16px;" alt="${ch}" title="${ch}" />`).join('')}
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn-secondary" style="flex: 1; padding: 6px; font-size: 9px; font-weight: 700;">RECHAZAR</button>
+              <button class="btn-action" style="flex: 1; padding: 6px; font-size: 9px; font-weight: 700;" onclick="document.getElementById('modal-success-offer-accepted').classList.add('active')">ACEPTAR</button>
+            </div>
+          </div>
+        `).join('');
+        container.innerHTML = html;
+      }
+
+      function renderOfferAcceptedContent() {
+        const container = document.getElementById('offer-accepted-content');
+        
+        // Layout 2: Grid avanzado - avatar 3 filas col 1, monto col 2 fila 2, fechas col 2 fila 3, contacto todas filas 4
+        const html = `
+          <div style="display: grid; grid-template-columns: 70px 1fr;">
+            <!-- Avatar: 3 filas -->
+            <div style="grid-row: 1 / 4;">
+              <img src="../../assets/user-svgrepo-com.svg" style="width: 65px; height: 65px; border-radius: 50%; border: 3px solid #ddd; flex-shrink: 0; object-fit: cover; padding: 8px; background: #F8F7F4;" alt="user" />
+            </div>
+            
+            <!-- Fila 1: Usuario -->
+            <div style="grid-column: 2; display: flex; align-items: center;">
+              <b style="font-size: 14px;">${buyerData.user}</b>
+            </div>
+            
+            <!-- Fila 2: Monto -->
+            <div style="grid-column: 2; background: #F8F7F4; border-radius: 4px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <b style="font-size: 18px; font-weight: 900; color: var(--accent);">$${buyerData.price.toLocaleString()}</b>
+              </div>
+            </div>
+            
+            <!-- Fila 3: Fechas (lado a lado) -->
+            <div style="grid-column: 2; display: flex; gap: 12px;">
+              <div style="font-size: 9px; color: #666; display: flex; align-items: center; gap: 4px;">
+                <img src="../../assets/calendar-alt-svgrepo-com.svg" style="width: 12px; height: 12px;" alt="date" />
+                ${buyerData.dateOffer}
+              </div>
+              <div style="font-size: 9px; color: #666; display: flex; align-items: center; gap: 4px;">
+                <img src="../../assets/calendar-alt-svgrepo-com.svg" style="width: 12px; height: 12px;" alt="date" />
+                ${buyerData.dateAccepted}
+              </div>
+            </div>
+            
+            <!-- Fila 4: Datos de contacto (todas columnas) -->
+            <div style="grid-column: 1 / 3; padding-top:8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="padding: 8px; background: #f9f9f9; border-radius: 4px;">
+                <div style="margin-bottom: 3px;display: flex;flex-direction: row;gap: 2px;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <div style="font-size: 8px; color: #666; margin-bottom: 3px;">TELÉFONO</div>
+                </div>
+                <div style="font-size: 10px; color: #666; display: flex; align-items: center; gap: 4px;">
+                  
+                  ${buyerData.phone}
+                </div>
+              </div>
+              <div style="padding: 8px; background: #f9f9f9; border-radius: 4px;">
+                <div style="margin-bottom: 3px;display: flex;flex-direction: row;gap: 2px;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0;"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#666" stroke-width="1.5"/><circle cx="12" cy="12" r="3.5" stroke="#666" stroke-width="2"/><circle cx="17" cy="7" r="1" fill="#666"/></svg>
+                    <div style="font-size: 8px; color: #666; margin-bottom: 3px;">INSTAGRAM</div>
+                </div>
+                <div style="font-size: 10px; color: #666; display: flex; align-items: center; gap: 4px;">
+                  
+                  ${buyerData.instagram}
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        `;
+        container.innerHTML = html;
+      }
+
+      // Initialize modals on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        // Override modal opening functions
+        const originalOpenOfferAccepted = window.openOfferAccepted || function() {};
+        window.openOfferAccepted = function() {
+          offerAcceptedCurrentLayout = 1;
+          renderOfferAcceptedContent();
+          document.getElementById('modal-offer-accepted-detail').classList.add('active');
+        };
+      });
+
+      // Helper para generar tokens
+      function generateTokenOptions(items) {
+        return items.map((item, idx) => `<label class="token ${idx === 0 ? 'selected' : ''}">${item}</label>`).join('');
+      }
+
+      // Variables para control de layouts en editar
+      let editLayoutMode = 1; // 1, 2 o 3
+      let collapsedFields = {}; // Trackear qué campos están colapsados
+
+      // Toggle para expandir/contraer campos
+      function toggleField(fieldId) {
+        const field = document.querySelector(`.collapsible-group[data-field="${fieldId}"]`);
+        if (!field) return;
+        
+        // Toggle collapsed state
+        const isCollapsed = !collapsedFields[fieldId];
+        collapsedFields[fieldId] = isCollapsed;
+        field.classList.toggle('collapsed', isCollapsed);
+        
+        // Update icon
+        const icon = field.querySelector('span:last-child');
+        if (icon) {
+          icon.innerHTML = isCollapsed ? '<img src="../../assets/chevron-up-svgrepo-com.svg" width="16" height="16"/>' : '<img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/>';
+        }
+      }
+
+      // Cambiar layout en desktop
+      function switchEditLayout(layoutNum) {
+        editLayoutMode = layoutNum;
+        // Re-renderizar el modal con el nuevo layout
+        renderEditModal();
+        // Mantener los datos que ya escribió el usuario (si es necesario implementar)
+      }
+
+      // GESTIÓN MULTIPASO CREAR CON BARRA DE PROGRESO
+      function renderCreateModal() {
+      const modalContent = document.getElementById('modal-create-content');
+      if (!modalContent) return;
+
+      if (currentMode === 'mobile') {
+        // --- ESTRUCTURA MÓVIL ORIGINAL (5 pasos) ---
+        modalContent.innerHTML = `
+          <div style="padding:15px; border-bottom:2px solid black; font-weight:900; text-transform:uppercase; font-size:12px;">Nueva Publicación</div>
+          <ul class="multi-steps" id="create-progress">
+            <li class="done"></li><li class="pending"></li><li class="pending"></li><li class="pending"></li><li class="pending"></li>
+          </ul>
+          <div style="height:300px; overflow-y:auto">
+            <!-- Paso 1: Título + Precio + Negociable + Descripción -->
+            <div id="c-step-1" class="step-panel active">
+              <div class="form-group"><span class="form-label">Título</span><input type="text" class="form-input" id="new-title" /></div>
+              <div class="form-group"><span class="form-label">Precio ($)</span><input type="number" class="form-input" id="new-price" /></div>
+              <div class="form-group"><label style="font-size:10px; font-weight:900"><input type="checkbox" id="new-negotiable" /> PRECIO NEGOCIABLE</label></div>
+              <div class="form-group"><span class="form-label">Descripción</span><textarea class="form-input" id="new-desc" style="height:80px" placeholder="Describe el estado..."></textarea></div>
+            </div>
+            <!-- Paso 2: Fotos -->
+            <div id="c-step-2" class="step-panel">
+              <div class="form-group"><span class="form-label">Fotos de la prenda</span>
+                <div class="photo-grid" id="create-photo-grid">
+                  <div class="photo-slot filled"><button class="delete-photo" style="border:none;  cursor:pointer; padding:0;"><img src="../../assets/xmark-svgrepo-com.svg" width="18" height="18"/></button></div>
+                  <div class="photo-slot filled"><button class="delete-photo" style="border:none;  cursor:pointer; padding:0;"><img src="../../assets/xmark-svgrepo-com.svg" width="18" height="18"/></button></div>
+                  <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div><div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                  <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div><div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                </div>
+              </div>
+            </div>
+            <!-- Paso 3: Categoría + Color + Marca -->
+            <div id="c-step-3" class="step-panel">
+              <div class="form-group"><span class="form-label">Categoría</span><div class="token-group">${generateTokenOptions(['Streetwear','Vintage','Formal','Casual','Deportivo','Elegante','Urbano','Clásico','Bohemio','Minimalista'])}</div></div>
+              <div class="form-group"><span class="form-label">Color</span><div class="token-group">${generateTokenOptions(['Negro','Blanco','Azul','Rojo','Verde','Amarillo','Gris','Beige','Rosa','Morado'])}</div></div>
+              <div class="form-group"><span class="form-label">Marca</span><div class="token-group" id="brand-group">${generateTokenOptions(['Nike','Adidas','Puma','Levis','Zara','H&M','Sin Marca'])}</div></div>
+            </div>
+            <!-- Paso 4: Género + Talla + Estado -->
+            <div id="c-step-4" class="step-panel">
+              <div class="form-group"><span class="form-label">Género</span><div style="display:flex; gap:10px;"><label><input type="radio" name="gen" /> HOMBRE</label><label><input type="radio" name="gen" /> MUJER</label><label><input type="radio" name="gen" /> AMBOS</label></div></div>
+              <div class="form-group"><span class="form-label">Talla</span><div class="token-group" id="size-group">${generateTokenOptions(['XS','S','M','L','XL','XXL'])}</div></div>
+              <div class="form-group"><span class="form-label">Categoría de Usado</span><select class="form-input" id="new-condition"><option>Nuevo con etiqueta</option><option>Como nuevo</option><option>Usado buen estado</option></select></div>
+            </div>
+            <!-- Paso 5: Ubicación -->
+            <div id="c-step-5" class="step-panel">
+              <div class="form-group"><span class="form-label">Ubicación</span>
+                <div id="selected-stations-5" style="display:flex; flex-wrap:wrap; gap:5px; padding:8px; border:1px solid #ddd; border-radius:4px; margin-bottom:8px; min-height:35px; background:#fafafa;"></div>
+                <input type="text" class="form-input" id="search-metro-5" placeholder="Buscar estación..." oninput="filterStations(this.value)" style="margin-bottom:10px;" />
+                <div id="metro-lines-5" style="font-size:11px; border:1px solid #ddd; border-radius:4px; overflow:hidden; max-height:250px; overflow-y:auto;">Cargando...</div>
+              </div>
+            </div>
+            <!-- Preview (paso 6) -->
+            <div id="c-step-preview" class="step-panel">
+              <div style="display:grid; grid-template-columns:120px 1fr; gap:16px; padding:12px; border-bottom:1px solid var(--line);">
+                <div><div style="aspect-ratio:3/4; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px; margin-bottom:8px;"></div><button id="toggle-photos-btn" class="btn-secondary" style="width:100%; padding:6px; font-size:10px; font-weight:700; cursor:pointer;" onclick="toggleMorePhotos()">Ver más</button></div>
+                <div><h4 style="margin:0 0 8px 0; font-size:14px; font-weight:700; line-height:1.2;">Vintage 90s Jacket Premium</h4>
+                <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--line);"><div style="font-size:18px; font-weight:900; color:var(--accent);">$25.000</div><div style="font-size:11px; color:#666;">✓ Negociable</div></div>
+                <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--line);"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:4px;">Categoría</div><div style="font-size:12px; font-weight:600;">Streetwear</div><div style="font-size:11px; color:#666;">Negro</div></div>
+                <div><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:4px;">Especificaciones</div><div style="font-size:12px; font-weight:600;">Hombre</div><div style="font-size:11px; color:#666;">Talla M · Usado buen estado</div></div></div>
+              </div>
+              <div id="more-photos-gallery" style="display:none; grid-template-columns:repeat(4, 1fr); gap:8px; padding:12px; border-bottom:1px solid var(--line);">
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #808080 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #c8c8c8 0%, #787878 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d8d8d8 0%, #909090 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #c0c0c0 0%, #707070 100%); border-radius:2px;"></div>
+              </div>
+              <div style="padding:12px; border-bottom:1px solid var(--line);"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Ubicación</div><div style="font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px;"><img src="../../assets/map-pin-alt-svgrepo-com.svg" width="14" height="14"/> Línea 1, Los Leones</div></div>
+              <div style="padding:12px;"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Descripción</div><p style="margin:0; font-size:11px; line-height:1.5; color:#555;">Chaqueta vintage en excelente estado, sin defectos. Poco uso, prácticamente nueva. Marca original, muy cómoda y versátil.</p></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="btn-prev-create" class="btn-secondary" style="display:none" onclick="moveCreateStep(-1)">Atrás</button>
+            <button id="btn-next-create" class="btn-action" onclick="moveCreateStep(1)">Siguiente</button>
+            <button id="btn-cancel-create" class="btn-secondary" style="border:none" onclick="closeCreate()">Cancelar</button>
+          </div>
+        `;
+        // Inicializar selectores de metro
+        generateMetroSelectors();
+      } 
+      else { // DESKTOP: nueva estructura 2 pasos + resumen
+        modalContent.innerHTML = `
+          <div style="padding:15px; border-bottom:2px solid black; font-weight:900; text-transform:uppercase; font-size:12px;">Nueva Publicación</div>
+          <ul class="multi-steps" id="create-progress">
+            <li class="done"></li><li class="pending"></li>
+          </ul>
+          <div style="height:500px; overflow-y:auto; padding:20px;">
+            <!-- PASO 1 (dos columnas) -->
+            <div id="c-step-1" class="step-panel active">
+              <div class="desktop-two-columns">
+                <div class="desktop-col" style="flex:5;">
+                  <div class="form-group"><span class="form-label">Título</span><input type="text" class="form-input" id="new-title" /></div>
+                  <div class="form-group"><span class="form-label">Precio ($)</span><input type="number" class="form-input" id="new-price" /></div>
+                  <div class="form-group"><label><input type="checkbox" id="new-negotiable" /> PRECIO NEGOCIABLE</label></div>
+                  <div class="form-group"><span class="form-label">Descripción</span><textarea class="form-input" id="new-desc" style="height:140px" placeholder="Describe el estado..."></textarea></div>
+                </div>
+                <div class="desktop-col" style="flex:9.4;">
+                  <div class="form-group"><span class="form-label">Fotos de la prenda</span>
+                    <div class="photo-grid photo-grid-desktop" id="create-photo-grid">
+                      <div class="photo-slot filled"><button class="delete-photo" style="border:none;  cursor:pointer; padding:0;"><img src="../../assets/xmark-svgrepo-com.svg" width="18" height="18"/></button></div>
+                      <div class="photo-slot filled"><button class="delete-photo" style="border:none; cursor:pointer; padding:0;"><img src="../../assets/xmark-svgrepo-com.svg" width="18" height="18"/></button></div>
+                      <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div><div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                      <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div><div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- PASO 2 -->
+            <div id="c-step-2" class="step-panel">
+              <div class="step2-grid">
+                <div class="form-group"><span class="form-label">Categoría</span><div class="token-group" id="cat-group">${generateTokenOptions(['Streetwear','Vintage','Formal','Casual','Deportivo'])}</div></div>
+                <div class="form-group"><span class="form-label">Color</span><div class="token-group" id="color-group">${generateTokenOptions(['Negro','Blanco','Azul','Rojo','Verde'])}</div></div>
+                <div class="form-group"><span class="form-label">Marca</span><div class="token-group" id="brand-group-desk">${generateTokenOptions(['Nike','Adidas','Puma','Levis','Zara','H&M','Sin Marca'])}</div></div>
+                <div class="form-group"><span class="form-label">Talla</span><div class="token-group" id="size-group-desk">${generateTokenOptions(['XS','S','M','L','XL','XXL'])}</div></div>
+                <div class="form-group"><span class="form-label">Género</span><div style="display:flex; gap:10px;"><label><input type="radio" name="gen" /> HOMBRE</label><label><input type="radio" name="gen" /> MUJER</label><label><input type="radio" name="gen" /> AMBOS</label></div></div>
+                <div class="form-group"><span class="form-label">Categoría de Usado</span><select class="form-input" id="new-condition"><option>Nuevo con etiqueta</option><option>Como nuevo</option><option>Usado buen estado</option></select></div>
+              </div>
+              <div class="form-group full-width"><span class="form-label">Ubicación</span>
+                <div id="selected-stations-5" style="display:flex; flex-wrap:wrap; gap:5px; padding:8px; border:1px solid #ddd; margin-bottom:8px; min-height:35px;"></div>
+                <input type="text" class="form-input" id="search-metro-5" placeholder="Buscar estación..." oninput="filterStations(this.value)" />
+                <div id="metro-lines-5" style="font-size:11px; border:1px solid #ddd; border-radius:4px; overflow:hidden; max-height:250px; overflow-y:auto;">Cargando...</div>
+              </div>
+            </div>
+            <!-- PREVIEW -->
+            <div id="c-step-preview" class="step-panel">
+              <div style="display:grid; grid-template-columns:200px 1fr; gap:20px; padding:16px;">
+                <div><div style="aspect-ratio:3/4; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px; margin-bottom:12px;"></div><button id="toggle-photos-btn" class="btn-secondary" style="width:100%; padding:8px; font-size:10px; font-weight:700; cursor:pointer;" onclick="toggleMorePhotos()">Ver más fotos</button></div>
+                <div><h3 style="margin:0 0 16px 0; font-size:18px; font-weight:700;">Vintage 90s Jacket Premium</h3>
+                <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--line);"><div style="font-size:24px; font-weight:900; color:var(--accent);">$25.000</div><div style="font-size:12px; color:#666;">✓ Negociable</div></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;"><div><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Categoría</div><div style="font-size:13px; font-weight:600;">Streetwear</div><div style="font-size:12px; color:#666;">Negro</div></div>
+                <div><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Especificaciones</div><div style="font-size:13px; font-weight:600;">Hombre</div><div style="font-size:12px; color:#666;">Talla M · Usado buen estado</div></div></div>
+                <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--line);"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Ubicación</div><div style="font-size:12px; display:flex; align-items:center; gap:6px;"><img src="../../assets/map-pin-alt-svgrepo-com.svg" width="14" height="14"/> Línea 1, Los Leones</div></div>
+                <div style="margin-top:12px;"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Descripción</div><p style="margin:0; font-size:12px; line-height:1.6; color:#555;">Chaqueta vintage en excelente estado, sin defectos. Poco uso, prácticamente nueva. Marca original, muy cómoda y versátil.</p></div></div>
+              </div>
+              <div id="more-photos-gallery" style="display:none; grid-template-columns:repeat(6, 1fr); gap:12px; padding:16px; border-top:1px solid var(--line);">
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="btn-prev-create" class="btn-secondary" style="display:none" onclick="moveCreateStep(-1)">Atrás</button>
+            <button id="btn-next-create" class="btn-action" onclick="moveCreateStep(1)">Siguiente</button>
+            <button id="btn-cancel-create" class="btn-secondary" style="border:none" onclick="closeCreate()">Cancelar</button>
+          </div>
+        `;
+        // Inicializar selectores de metro
+        generateMetroSelectors();
+        // Marcar tokens seleccionados por defecto
+        document.querySelectorAll('#cat-group .token').firstChild?.classList.add('selected');
+        document.querySelectorAll('#color-group .token').firstChild?.classList.add('selected');
+      }
+      // Reiniciar paso y UI
+      createStep = 1;
+      updateCreateUI();
+    }
+      function openCreate() {
+        createStep = 1;
+        renderCreateModal();
+        updateCreateUI();
+        document.getElementById("modal-create").classList.add("active");
+      }
+      function closeCreate() {
+        document.getElementById("modal-create").classList.remove("active");
+      }
+      function publishCreate() {
+        document.getElementById("modal-success-created").classList.add("active");
+        createStep = 1;
+        closeCreate();
+      }
+      function moveCreateStep(n) {
+        const totalStepsDesktop = 2; // solo 2 pasos + preview
+        const isDesktop = currentMode === 'desktop';
+        createStep += n;
+        if (createStep > (isDesktop ? 3 : 6)) { publishCreate(); return; }
+        updateCreateUI();
+    }
+      function updateCreateUI() {
+        // Mostrar el panel correcto o preview
+        const isDesktop = currentMode === 'desktop';
+        const maxStep = isDesktop ? 2 : 5;
+        const previewStep = isDesktop ? 3 : 6;
+        if (createStep === previewStep) {
+          // Mostrar preview
+          const previewPanel = document.getElementById("c-step-preview");
+          document.querySelectorAll(".step-panel").forEach(p => p.classList.remove("active"));
+          if (previewPanel) previewPanel.classList.add("active");
+          document.getElementById("btn-prev-create").style.display = "block";
+          document.getElementById("btn-next-create").style.display = "none";
+          // Marcar paso 5 como done en la barra
+          const steps = document.querySelectorAll("#create-progress > li");
+          steps.forEach((step, idx) => {
+          step.classList.remove("done","is-active","pending");
+          if (idx+1 <= maxStep) step.classList.add("done");
+          else step.classList.add("pending");
+        });
+          // Crear botón Publicar
+          let publishBtn = document.getElementById("btn-publish-create");
+        if (!publishBtn) {
+            publishBtn = document.createElement("button");
+            publishBtn.className = "btn-action";
+            publishBtn.id = "btn-publish-create";
+            publishBtn.textContent = "Publicar";
+            publishBtn.onclick = publishCreate;
+            const footer = document.querySelector("#modal-create .modal-footer");
+            footer.insertBefore(publishBtn, document.getElementById("btn-cancel-create"));
+            }
+        } else {
+            // Ocultar preview y botón publicar
+            document.getElementById("c-step-preview")?.classList.remove("active");
+            const publishBtn = document.getElementById("btn-publish-create");
+            if (publishBtn) publishBtn.remove();
+            document.getElementById("btn-next-create").style.display = "block";
+            // Mostrar step correcto
+            document.querySelectorAll(".step-panel").forEach((p, i) => {
+            p.classList.toggle("active", i === createStep-1);
+            });
+            // Actualizar barra
+            const steps = document.querySelectorAll("#create-progress > li");
+            steps.forEach((step, idx) => {
+            step.classList.remove("done","is-active","pending");
+            if (idx+1 < createStep) step.classList.add("done");
+            else if (idx+1 === createStep) step.classList.add("is-active");
+            else step.classList.add("pending");
+            });
+            document.getElementById("btn-prev-create").style.display = createStep === 1 ? "none" : "block";
+            document.getElementById("btn-next-create").innerText = (isDesktop && createStep === maxStep) ? "Ver Resumen" : "Siguiente";
+        }
+      }
+      function toggleMorePhotos() {
+        const gallery = document.getElementById("more-photos-gallery");
+        const btn = document.getElementById("toggle-photos-btn");
+        const isHidden = gallery.style.display === "none";
+        gallery.style.display = isHidden ? "grid" : "none";
+        btn.textContent = isHidden ? "Ver menos fotos" : "Ver 4 fotos más";
+      }
+      function toggleMorePhotosStatic() {
+        const gallery = document.getElementById("more-photos-gallery-static");
+        const btn = document.getElementById("toggle-photos-btn-static");
+        const isHidden = gallery.style.display === "none";
+        gallery.style.display = isHidden ? "grid" : "none";
+        btn.textContent = isHidden ? "Ver menos fotos" : "Ver más";
+      }
+      function removeStationEdit(btn) {
+        btn.closest("span").remove();
+      }
+      function toggleLineEdit(header) {
+        const content = header.nextElementSibling;
+        const arrow = header.querySelector("span:last-child");
+        if (content.style.display === "none") {
+          content.style.display = "block";
+          arrow.innerHTML = '<img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/>';
+        } else {
+          content.style.display = "none";
+          arrow.innerHTML = '<img src="../../assets/chevron-up-svgrepo-com.svg" width="16" height="16"/>';
+        }
+      }
+      function filterStationsEdit(searchTerm) {
+        const term = searchTerm.toLowerCase();
+        const labels = document.querySelectorAll("[id='modal-edit'] .metro-station-edit");
+        labels.forEach(label => {
+          const text = label.parentElement.textContent.toLowerCase();
+          label.parentElement.style.display = (term === "" || text.includes(term)) ? "block" : "none";
+        });
+      }
+
+      function togglePhotoSection() {
+        const ps = document.getElementById("photo-section");
+        ps.style.display = ps.style.display === "none" ? "grid" : "none";
+      }
+
+      // Funciones para selector de estaciones
+      function toggleLine(header) {
+        const content = header.nextElementSibling;
+        const arrow = header.querySelector('span:last-child');
+        if (content.style.display === "none") {
+          content.style.display = "block";
+          arrow.innerHTML = '<img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/>';
+        } else {
+          content.style.display = "none";
+          arrow.innerHTML = '<img src="../../assets/chevron-up-svgrepo-com.svg" width="16" height="16"/>';
+        }
+      }
+
+      function removeStation(btn) {
+        btn.parentElement.remove();
+      }
+
+      function filterStations(searchTerm) {
+        const term = searchTerm.toLowerCase();
+        const labels = document.querySelectorAll("#c-step-5 .metro-station");
+        
+        labels.forEach(label => {
+          const text = label.parentElement.textContent.toLowerCase();
+          if (term === "" || text.includes(term)) {
+            label.parentElement.style.display = "block";
+          } else {
+            label.parentElement.style.display = "none";
+          }
+        });
+      }
+
+      // RENDERIZAR MODAL EDITAR (dinámico según modo)
+      function renderEditModal() {
+        const modalContent = document.getElementById('modal-edit-content');
+        if (!modalContent) return;
+
+        if (currentMode === 'mobile') {
+          // MOBILE: Formulario en 1 columna con campos colapsables
+          modalContent.innerHTML = `
+            <div
+            style="
+                padding: 15px;
+                border-bottom: 1px solid var(--line);
+                font-weight: 900;
+                text-transform: uppercase;
+                font-size: 12px;
+            "
+            >
+            Editar Publicación
+            </div>
+            <div
+            id="offers-warning"
+            style="
+                background: #ff4444;
+                color: white;
+                font-size: 11px;
+                padding: 12px;
+                font-weight: 900;
+                display: none;
+                border-radius: 24px;
+                text-transform: uppercase;
+                margin: 12px;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            "
+            >
+            <img src="../../assets/lock-alt-svgrepo-com.svg" width="14" height="14" style="filter: brightness(0) invert(1); flex-shrink: 0;"/>
+            <span>PRECIO BLOQUEADO - HAY OFERTAS ACTIVAS</span>
+            </div>
+            <div style="height: 300px; overflow-y: auto">
+            <div class="form-group collapsible-group" data-field="title">
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('title')"
+                >
+                <span class="form-label" style="margin: 0">Título</span
+                ><span style="font-size: 16px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <input type="text" class="form-input" id="edit-title" />
+                </div>
+            </div>
+            <div
+                class="form-group collapsible-group"
+                data-field="price"
+                id="price-section"
+            >
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('price')"
+                >
+                <span class="form-label" style="margin: 0">Precio & Negociable ($)</span
+                ><span style="font-size: 16px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <input type="number" class="form-input" id="edit-price" /><label
+                    style="
+                    font-size: 10px;
+                    margin-top: 10px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    "
+                    ><input type="checkbox" id="edit-negotiable" /> PRECIO NEGOCIABLE</label
+                >
+                </div>
+            </div>
+            <div class="form-group collapsible-group" data-field="desc">
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('desc')"
+                >
+                <span class="form-label" style="margin: 0">Descripción</span
+                ><span style="font-size: 16px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <textarea
+                    class="form-input"
+                    id="edit-desc"
+                    style="height: 80px; resize: none"
+                ></textarea>
+                </div>
+            </div>
+            <div class="form-group collapsible-group" data-field="photos">
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('photos')"
+                >
+                <span class="form-label" style="margin: 0">Fotos de la prenda</span
+                ><span style="font-size: 16px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <div id="photo-section" class="photo-grid">
+                    <div class="photo-slot filled">
+                    <button class="delete-photo" style="border:none; cursor:pointer; padding:0;"><img src="../../assets/xmark-svgrepo-com.svg" width="18" height="18"/></button>
+                    </div>
+                    <div class="photo-slot filled">
+                    <button class="delete-photo" style="border:none; cursor:pointer; padding:0;"><img src="../../assets/xmark-svgrepo-com.svg" width="18" height="18"/></button>
+                    </div>
+                    <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                    <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                    <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                    <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                </div>
+                </div>
+            </div>
+            <div class="form-group collapsible-group" data-field="specs">
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('specs')"
+                >
+                <span class="form-label" style="margin: 0">Especificaciones</span
+                ><span style="font-size: 16px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <div>
+                    <div class="form-group" style="padding: 8px 0; border: none">
+                    <span class="form-label" style="font-size: 8px">Categoría</span>
+                    <div class="token-group" style="gap: 4px">
+                        ${generateTokenOptions(['Streetwear','Vintage','Formal','Casual','Deportivo'])}
+                    </div>
+                    </div>
+                    <div class="form-group" style="padding: 8px 0; border: none">
+                    <span class="form-label" style="font-size: 8px">Color</span>
+                    <div class="token-group" style="gap: 4px">
+                        ${generateTokenOptions(['Negro','Blanco','Azul','Rojo','Verde'])}
+                    </div>
+                    </div>
+                    <div class="form-group" style="padding: 8px 0; border: none">
+                    <span class="form-label" style="font-size: 8px">Marca</span>
+                    <div class="token-group" style="gap: 4px">
+                        ${generateTokenOptions(['Nike','Adidas','Puma','Levis','Zara'])}
+                    </div>
+                    </div>
+                    <div class="form-group" style="padding: 8px 0; border: none">
+                    <span class="form-label" style="font-size: 8px">Género</span>
+                    <div style="display: flex; gap: 6px; font-size: 9px">
+                        <label><input type="radio" name="edit-gen" /> H</label
+                        ><label><input type="radio" name="edit-gen" /> M</label
+                        ><label><input type="radio" name="edit-gen" /> A</label>
+                    </div>
+                    </div>
+                    <div class="form-group" style="padding: 8px 0; border: none">
+                    <span class="form-label" style="font-size: 8px">Talla</span>
+                    <div class="token-group" style="gap: 4px">
+                        ${generateTokenOptions(['XS','S','M','L','XL'])}
+                    </div>
+                    </div>
+                    <div class="form-group" style="padding: 8px 0; border: none">
+                    <span class="form-label" style="font-size: 8px">Estado</span
+                    ><select
+                        class="form-input"
+                        id="edit-condition"
+                        style="font-size: 9px; padding: 4px"
+                    >
+                        <option>Nuevo con etiqueta</option>
+                        <option>Como nuevo</option>
+                        <option>Usado buen estado</option>
+                        <option>Usado regular</option>
+                    </select>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="form-group collapsible-group" data-field="location">
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('location')"
+                >
+                <span class="form-label" style="margin: 0">Ubicación</span
+                ><span style="font-size: 16px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <div
+                    id="selected-stations-edit"
+                    style="
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 5px;
+                    padding: 8px;
+                    border: 1px solid #ddd;
+                    margin-bottom: 8px;
+                    min-height: 35px;
+                    background: #fafafa;
+                    "
+                ></div>
+                <input
+                    type="text"
+                    class="form-input"
+                    placeholder="Buscar estación..."
+                    style="margin-bottom: 10px"
+                    oninput="filterStationsEdit(this.value)"
+                />
+                <div
+                    id="metro-lines-edit"
+                    style="
+                    font-size: 11px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    overflow: hidden;
+                    max-height: 200px;
+                    overflow-y: auto;
+                    "
+                >
+                    Cargando...
+                </div>
+                </div>
+            </div>
+            </div>
+            <div style="padding: 15px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line);">
+            <button class="btn-action" onclick="closeModals()">Guardar Cambios</button>
+            <button class="btn-secondary" style="border: none" onclick="closeModals()">
+                Cancelar
+            </button>
+            </div>
+
+          `;
+          generateMetroSelectors();
+        } else {
+          // DESKTOP: Layout 3 (colapsable)
+          modalContent.innerHTML = `
+            <div
+            style="
+                padding: 15px;
+                border-bottom: 1px solid var(--line);
+                font-weight: 900;
+                text-transform: uppercase;
+                font-size: 12px;
+            "
+            >
+            Editar Publicación
+            </div>
+            <div
+            id="offers-warning"
+            style="
+                background: #ff4444;
+                color: white;
+                font-size: 11px;
+                padding: 12px;
+                font-weight: 900;
+                display: none;
+                border-radius: 24px;
+                text-transform: uppercase;
+                margin: 12px;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            "
+            >
+            <img src="../../assets/lock-alt-svgrepo-com.svg" width="14" height="14" style="filter: brightness(0) invert(1); flex-shrink: 0;"/>
+            <span>PRECIO BLOQUEADO - HAY OFERTAS ACTIVAS</span>
+            </div>
+            <div style="height: 500px; overflow-y: auto; padding: 20px">
+            <div class="form-group collapsible-group" data-field="title">
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('title')"
+                >
+                <span class="form-label" style="margin: 0">Título</span
+                ><span style="font-size: 14px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <input type="text" class="form-input" id="edit-title" />
+                </div>
+            </div>
+            <div
+                class="form-group collapsible-group"
+                data-field="price"
+                id="price-section"
+            >
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('price')"
+                >
+                <span class="form-label" style="margin: 0">Precio & Negociable</span
+                ><span style="font-size: 14px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <input type="number" class="form-input" id="edit-price" /><label
+                    style="font-size: 10px; margin-top: 10px"
+                    ><input type="checkbox" id="edit-negotiable" /> NEGOCIABLE</label
+                >
+                </div>
+            </div>
+            <div class="form-group collapsible-group" data-field="desc">
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('desc')"
+                >
+                <span class="form-label" style="margin: 0">Descripción</span
+                ><span style="font-size: 14px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <textarea
+                    class="form-input"
+                    id="edit-desc"
+                    style="height: 80px; resize: none"
+                ></textarea>
+                </div>
+            </div>
+            <div class="form-group collapsible-group" data-field="photos">
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('photos')"
+                >
+                <span class="form-label" style="margin: 0">Fotos de la prenda</span
+                ><span style="font-size: 14px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <div id="photo-section" class="photo-grid photo-grid-desktop">
+                    <div class="photo-slot filled">
+                    <button class="delete-photo" style="border:none;cursor:pointer; padding:0;"><img src="../../assets/xmark-svgrepo-com.svg" width="18" height="18"/></button>
+                    </div>
+                    <div class="photo-slot filled">
+                    <button class="delete-photo" style="border:none; cursor:pointer; padding:0;"><img src="../../assets/xmark-svgrepo-com.svg" width="18" height="18"/></button>
+                    </div>
+                    <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                    <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                    <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                    <div class="photo-slot empty"><img src="../../assets/image-plus-svgrepo-com.svg" width="24" height="24"/></div>
+                </div>
+                </div>
+            </div>
+            <div class="form-group collapsible-group" data-field="specs">
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('specs')"
+                >
+                <span class="form-label" style="margin: 0">Especificaciones</span
+                ><span style="font-size: 14px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <div
+                    style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 12px;
+                    font-size: 11px;
+                    "
+                >
+                    <div>
+                    <span style="font-weight: 700; display: block; margin-bottom: 6px"
+                        >Categoría</span
+                    >
+                    <div class="token-group" style="gap: 4px">
+                        ${generateTokenOptions(['Streetwear','Vintage','Formal','Casual','Deportivo'])}
+                    </div>
+                    </div>
+                    <div>
+                    <span style="font-weight: 700; display: block; margin-bottom: 6px"
+                        >Color</span
+                    >
+                    <div class="token-group" style="gap: 4px">
+                        ${generateTokenOptions(['Negro','Blanco','Azul'])}
+                    </div>
+                    </div>
+                    <div>
+                    <span style="font-weight: 700; display: block; margin-bottom: 6px"
+                        >Marca</span
+                    >
+                    <div class="token-group" style="gap: 4px">
+                        ${generateTokenOptions(['Nike','Adidas','Puma'])}
+                    </div>
+                    </div>
+                    <div>
+                    <span style="font-weight: 700; display: block; margin-bottom: 6px"
+                        >Talla</span
+                    >
+                    <div class="token-group" style="gap: 4px">
+                        ${generateTokenOptions(['S','M','L','XL'])}
+                    </div>
+                    </div>
+                    <div>
+                    <span style="font-weight: 700; display: block; margin-bottom: 6px"
+                        >Género</span
+                    >
+                    <div style="display: flex; gap: 4px">
+                        <label style="font-size: 9px"
+                        ><input type="radio" name="edit-gen" /> H</label
+                        ><label style="font-size: 9px"
+                        ><input type="radio" name="edit-gen" /> M</label
+                        >
+                    </div>
+                    </div>
+                    <div>
+                    <span style="font-weight: 700; display: block; margin-bottom: 6px"
+                        >Estado</span
+                    ><select
+                        class="form-input"
+                        id="edit-condition"
+                        style="font-size: 10px; padding: 4px"
+                    >
+                        <option>Nuevo</option>
+                        <option>Como nuevo</option>
+                    </select>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="form-group collapsible-group" data-field="location">
+                <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                "
+                onclick="toggleField('location')"
+                >
+                <span class="form-label" style="margin: 0">Ubicación</span
+                ><span style="font-size: 14px; display:flex; align-items:center;"><img src="../../assets/chevron-down-svgrepo-com.svg" width="16" height="16"/></span>
+                </div>
+                <div class="field-content">
+                <div
+                    id="selected-stations-edit"
+                    style="
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 5px;
+                    padding: 8px;
+                    border: 1px solid #ddd;
+                    margin-bottom: 8px;
+                    min-height: 35px;
+                    "
+                ></div>
+                <input
+                    type="text"
+                    class="form-input"
+                    placeholder="Buscar estación..."
+                    style="font-size: 10px; padding: 6px"
+                    oninput="filterStationsEdit(this.value)"
+                />
+                <div
+                    id="metro-lines-edit"
+                    style="
+                    font-size: 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    overflow: hidden;
+                    max-height: 180px;
+                    overflow-y: auto;
+                    "
+                >
+                    Cargando...
+                </div>
+                </div>
+            </div>
+            </div>
+            <div class="modal-footer">
+            <button class="btn-action" onclick="closeModals()">Guardar Cambios</button>
+            <button class="btn-secondary" style="border: none" onclick="closeModals()">
+                Cancelar
+            </button>
+            </div>
+
+          `;
+          generateMetroSelectors();
+        }
+        
+        // Inicializar campos colapsables (después de que se renderice el modal)
+        const collapsibleGroups = document.querySelectorAll('.collapsible-group');
+        if (currentMode === 'mobile' || currentMode === 'desktop') {
+          collapsibleGroups.forEach((group) => {
+            const fieldId = group.getAttribute('data-field');
+            collapsedFields[fieldId] = true; // Start collapsed
+            group.classList.add('collapsed');
+            const icon = group.querySelector('span:last-child');
+            if (icon) icon.innerHTML = '<img src="../../assets/chevron-up-svgrepo-com.svg" width="16" height="16"/>';
+          });
+        }
+      }
+
+      function openEdit(item) {
+        renderEditModal();
+        document.getElementById("edit-title").value = item.name;
+        document.getElementById("edit-price").value = item.price
+          .replace("$", "")
+          .replace(".", "");
+        const hasOffers = item.offers > 0;
+        document.getElementById("offers-warning").style.display = hasOffers
+          ? "flex"
+          : "none";
+        
+        // Deshabilitar o habilitar precio y negociable
+        const priceInput = document.getElementById("edit-price");
+        const negotiableCheckbox = document.getElementById("edit-negotiable");
+        const priceSection = document.getElementById("price-section");
+        
+        if (hasOffers) {
+          priceInput.disabled = true;
+          negotiableCheckbox.disabled = true;
+          priceSection.style.opacity = "0.5";
+          priceInput.style.backgroundColor = "#f0f0f0";
+          priceInput.style.cursor = "not-allowed";
+          negotiableCheckbox.style.cursor = "not-allowed";
+          priceSection.style.pointerEvents = "none";
+        } else {
+          priceInput.disabled = false;
+          negotiableCheckbox.disabled = false;
+          priceSection.style.opacity = "1";
+          priceSection.style.pointerEvents = "auto";
+          priceInput.style.backgroundColor = "";
+          priceInput.style.cursor = "";
+          negotiableCheckbox.style.cursor = "";
+        }
+        
+        document.getElementById("modal-edit").classList.add("active");
+      }
+
+      function openStaticView(item) {
+        const modalContent = document.querySelector('#modal-view-static .modal-content');
+        
+        if (currentMode === 'mobile') {
+          // Mobile: uso el layout compacto como en c-step-preview
+          modalContent.innerHTML = `
+            <div style="padding:15px; border-bottom:1px solid var(--line); font-weight:900; text-transform:uppercase; font-size:12px;">Detalles de la Prenda</div>
+            <div style="height:300px; overflow-y:auto;">
+              <div style="display:grid; grid-template-columns:120px 1fr; gap:16px; padding:12px; border-bottom:1px solid var(--line);">
+                <div><div style="aspect-ratio:3/4; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px; margin-bottom:8px;"></div><button id="toggle-photos-btn-mobile-view" class="btn-secondary" style="width:100%; padding:6px; font-size:10px; font-weight:700; cursor:pointer;" onclick="toggleMorePhotosMobileView()">Ver más</button></div>
+                <div><h4 style="margin:0 0 8px 0; font-size:14px; font-weight:700; line-height:1.2;">${item.name}</h4>
+                <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--line);"><div style="font-size:18px; font-weight:900; color:var(--accent);">${item.price}</div><div style="font-size:11px; color:#666; display:flex; align-items:center; gap:4px;"><img src="../../assets/handshake-svgrepo-com.svg" width="14" height="14"/> Negociable</div></div>
+                <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--line);"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:4px;">Categoría</div><div style="font-size:12px; font-weight:600;">Streetwear</div><div style="font-size:11px; color:#666;">Negro</div></div>
+                <div><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:4px;">Especificaciones</div><div style="font-size:12px; font-weight:600;">Hombre</div><div style="font-size:11px; color:#666;">Talla M · Usado buen estado</div></div></div>
+              </div>
+              <div id="more-photos-gallery-mobile-view" style="display:none; grid-template-columns:repeat(4, 1fr); gap:8px; padding:12px; border-bottom:1px solid var(--line);">
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+              </div>
+              <div style="padding:12px; border-bottom:1px solid var(--line);"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Ubicación</div><div style="font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px;"><img src="../../assets/map-pin-alt-svgrepo-com.svg" width="14" height="14"/> Línea 1, Los Leones</div></div>
+              <div style="padding:12px;"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Descripción</div><p style="margin:0; font-size:11px; line-height:1.5; color:#555;">Chaqueta vintage en excelente estado, sin defectos. Poco uso, prácticamente nueva. Marca original, muy cómoda y versátil.</p></div>
+            </div>
+            <div style="padding:15px; display:flex; gap:10px; border-top:1px solid var(--line);">
+              <button onclick="closeModals()" class="btn-secondary" style="width:100%;">Cerrar</button>
+            </div>
+          `;
+        } else {
+          // Desktop: mantener layout original
+          modalContent.innerHTML = `
+            <div style="padding:15px; border-bottom:1px solid var(--line); font-weight:900; text-transform:uppercase; font-size:12px;">Detalles de la Prenda</div>
+            <div style="height:350px; overflow-y:auto;">
+              <div style="display:grid; grid-template-columns:200px 1fr; gap:20px; padding:16px;">
+                <div>
+                  <div style="aspect-ratio:3/4; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px; margin-bottom:12px;"></div>
+                  <button id="toggle-photos-btn-static" class="btn-secondary" style="width:100%; padding:8px; font-size:10px; font-weight:700; cursor:pointer;" onclick="toggleMorePhotosStatic()">Ver más fotos</button>
+                </div>
+                <div>
+                  <h3 style="margin:0 0 16px 0; font-size:18px; font-weight:700;">${item.name}</h3>
+                  <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--line);">
+                    <div style="font-size:24px; font-weight:900; color:var(--accent);">${item.price}</div>
+                    <div style="font-size:12px; color:#666; display:flex; align-items:center; gap:4px;"><img src="../../assets/handshake-svgrepo-com.svg" width="14" height="14"/> Negociable</div>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                    <div>
+                      <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Categoría</div>
+                      <div style="font-size:13px; font-weight:600;">Streetwear</div>
+                      <div style="font-size:12px; color:#666;">Negro</div>
+                    </div>
+                    <div>
+                      <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Especificaciones</div>
+                      <div style="font-size:13px; font-weight:600;">Hombre</div>
+                      <div style="font-size:12px; color:#666;">Talla M · Usado buen estado</div>
+                    </div>
+                  </div>
+                  <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--line);">
+                    <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Ubicación</div>
+                    <div style="font-size:12px; display:flex; align-items:center; gap:6px;"><img src="../../assets/map-pin-alt-svgrepo-com.svg" width="14" height="14"/> Línea 1, Los Leones</div>
+                  </div>
+                  <div style="margin-top:12px;">
+                    <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Descripción</div>
+                    <p style="margin:0; font-size:12px; line-height:1.6; color:#555;">Chaqueta vintage en excelente estado, sin defectos. Poco uso, prácticamente nueva. Marca original, muy cómoda y versátil.</p>
+                  </div>
+                </div>
+              </div>
+              <div id="more-photos-gallery-static" style="display:none; grid-template-columns:repeat(6, 1fr); gap:12px; padding:16px; border-top:1px solid var(--line);">
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+              </div>
+            </div>
+            <div style="padding:15px; display:flex; gap:10px; border-top:1px solid var(--line);">
+              <button onclick="closeModals()" class="btn-secondary" style="width:100%; ">Cerrar</button>
+            </div>
+          `;
+        }
+        
+        document.getElementById("modal-view-static").classList.add("active");
+      }
+
+      function toggleMorePhotosMobileView() {
+        const gallery = document.getElementById("more-photos-gallery-mobile-view");
+        const btn = document.getElementById("toggle-photos-btn-mobile-view");
+        const isHidden = gallery.style.display === "none";
+        gallery.style.display = isHidden ? "grid" : "none";
+        btn.textContent = isHidden ? "Ver menos" : "Ver más";
+      }
+
+      function openOffersModal(item) {
+        offersCurrentLayout = 1;
+        renderOffersContent();
+        document.getElementById("modal-view-offers").classList.add("active");
+      }
+
+      function openAcceptedOfferDetail() {
+        offerAcceptedCurrentLayout = 1;
+        renderOfferAcceptedContent();
+        document.getElementById("modal-offer-accepted-detail").classList.add("active");
+      }
+      function openConfirm() {
+        document.getElementById("modal-success-sold").classList.add("active");
+      }
+      function openSaleInfo(item) {
+        const modalContent = document.getElementById('modal-sale-info-content');
+        const buyer = item.buyer || "@comprador_ejemplo";
+        const amount = item.price;
+        const dateAccepted = item.saleDate || "15 Feb 2026";
+        const dateCompleted = "20 Feb 2026"; // fecha de entrega
+
+        // MISMO LAYOUT PARA MOBILE Y DESKTOP
+        modalContent.innerHTML = `
+          <div style="padding:15px; font-weight:900; text-transform:uppercase; font-size:12px; border-bottom: 1px solid var(--line);">Información de la Venta</div>
+          <div style="padding:12px; display:flex; flex-direction:column; gap:12px;">
+            <!-- Monto destacado (sin fondo) -->
+            <div style="display:flex; align-items:center; gap:6px;">
+              <img src="../../assets/circle-dollar-svgrepo-com.svg" width="16" height="16"/>
+              <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Monto</span>
+              <span style="font-size:13px; font-weight:900; color:var(--accent); flex:1; text-align:right;">${amount}</span>
+            </div>
+            
+            <!-- Comprador -->
+            <div style="display:flex; align-items:center; gap:6px;">
+              <img src="../../assets/user-svgrepo-com.svg" width="14" height="14"/>
+              <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Comprador</span>
+              <span style="font-size:11px; font-weight:600; flex:1; text-align:right;">${buyer}</span>
+            </div>
+            
+            <!-- Fecha de aceptación -->
+            <div style="display:flex; align-items:center; gap:6px;">
+              <img src="../../assets/calendar-alt-svgrepo-com.svg" width="14" height="14"/>
+              <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Aceptada</span>
+              <span style="font-size:11px; font-weight:600; flex:1; text-align:right;">${dateAccepted}</span>
+            </div>
+            
+            <!-- Fecha de entrega -->
+            <div style="display:flex; align-items:center; gap:6px;">
+              <img src="../../assets/check-svgrepo-com.svg" width="14" height="14"/>
+              <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Entregada</span>
+              <span style="font-size:11px; font-weight:600; flex:1; text-align:right;">${dateCompleted}</span>
+            </div>
+            
+            <!-- Contacto con iconos -->
+            <div style="display:flex; align-items:center; gap:6px;">
+              <img src="../../assets/message-circle-chat-svgrepo-com.svg" width="14" height="14"/>
+              <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Contacto</span>
+              <div style="display:flex; align-items:center; gap:6px; flex:1; justify-content:flex-end;">
+                <img src="../../assets/Communication/whatsapp-svgrepo-com.svg" width="14" height="14"/>
+                <img src="../../assets/Communication/instagram-svgrepo-com.svg" width="14" height="14"/>
+              </div>
+            </div>
+          </div>
+          <div style="padding:15px; display:flex; gap:10px; border-top:1px solid var(--line);">
+            <button class="btn-action" style="flex:1;" onclick="closeModals()">Cerrar</button>
+          </div>
+        `;
+
+        document.getElementById("modal-sale-info").classList.add("active");
+      }
+
+      function openActionsCompact(item) {
+        const container = document.getElementById("compact-actions-container");
+        container.innerHTML = "";
+        const isSold = item.tab === "historial";
+        if (isSold) {
+          container.innerHTML = `<div style="display:flex; flex-direction:column; gap:10px;"><div><button class="btn-secondary" style="width:100%;" onclick="closeModals(); openStaticView(${JSON.stringify(item).replace(/"/g, "&quot;")})">Ver Prenda</button></div><div><button class="btn-action" style="width:100%; " onclick="closeModals(); openSaleInfo(${JSON.stringify(item).replace(/"/g, "&quot;")})">Ver Venta</button></div></div>`;
+        } else if (item.steps[1]) {
+          container.innerHTML = `<div style="display:flex; flex-direction:column; gap:10px;"><div><button class="btn-secondary" style="width:100%; " onclick="closeModals(); openStaticView(${JSON.stringify(item).replace(/"/g, "&quot;")})">Ver Prenda</button></div><div style="display:flex; flex-direction:column; gap:10px;"><button class="btn-secondary" style="width:100%;" onclick="closeModals(); openAcceptedOfferDetail()">Ver Oferta</button><button class="btn-action" style="width:100%; " onclick="closeModals(); openConfirm()">Marcar Entregado</button></div><div><button class="btn-danger" style="width:100%; " onclick="closeModals(); document.getElementById('modal-delete').classList.add('active')">Borrar</button></div></div>`;
+        } else {
+          container.innerHTML = `<div style="display:flex; flex-direction:column; gap:10px;"><div style="display:flex; flex-direction:column; gap:10px;"><button class="btn-secondary" style="width:100%; " onclick='closeModals(); openEdit(${JSON.stringify(item).replace(/"/g, "&quot;")})'>Editar</button><button class="btn-danger" style="width:100%; " onclick="closeModals(); document.getElementById('modal-delete').classList.add('active')">Borrar</button></div>${item.offers > 0 ? `<div><button class="btn-action" style="width:100%; " onclick='closeModals(); openOffersModal(${JSON.stringify(item).replace(/"/g, "&quot;")})'>Ver Ofertas</button></div>` : ""}</div>`;
+        }
+        document
+          .getElementById("modal-actions-compact")
+          .classList.add("active");
+      }
+
+      const data = [
+        {
+          id: 1,
+          name: "Vintage 90s Jacket",
+          price: "$25.000",
+          offers: 3,
+          steps: [true, false, false],
+          tab: "activas",
+        },
+        {
+          id: 2,
+          name: "Levis 501 Custom",
+          price: "$18.000",
+          offers: 0,
+          steps: [false, false, false],
+          tab: "activas",
+        },
+        {
+          id: 3,
+          name: "Archive Nike Bag",
+          price: "$30.000",
+          offers: 1,
+          steps: [true, true, true],
+          tab: "historial",
+          buyer: "@nike_lover",
+          saleDate: "10 Mar 2026",
+        },
+        {
+          id: 6,
+          name: "Carhartt Detroit",
+          price: "$45.000",
+          offers: 1,
+          steps: [true, true, false],
+          tab: "activas",
+        },
+      ];
+
+      function render() {
+        const viewport = document.getElementById("viewport");
+        let html = `
+            ${currentMode==='desktop' ? `<header style="justify-content:space-between; padding:20px 40px; border-bottom:1px solid var(--line); display:flex; align-items:center;"><div style="font-family:'strelka'; font-weight:700; font-size:20px;">VTRNA.</div><nav style="display:flex; gap:30px; align-items:center;"><button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/house-floor-svgrepo-com.svg" width="20" height="20"/></button><button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/cart-shopping-svgrepo-com.svg" width="20" height="20"/></button><button style="border:none; background:rgba(0,0,0,0.1); cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center; border-radius:50%;"><img src="../../assets/store-svgrepo-com.svg" width="20" height="20"/></button><button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/bell-alt-svgrepo-com.svg" width="20" height="20"/></button><button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/user-svgrepo-com.svg" width="20" height="20"/></button></nav></header>` : ''}
+            <div class="main-header"><div class="header-title">Mis Ventas</div></div>
+            <div class="view-controls">
+                <button class="view-btn ${currentView === "list" ? "active" : ""}" onclick="setView('list')"><img src="../../assets/layout/menu-svgrepo-com.svg" width="20" height="20"/></button>
+                <button class="view-btn ${currentView === "grid2" ? "active" : ""}" onclick="setView('grid2')"><img src="../../assets/layout/menu-navigation-grid-1528-svgrepo-com.svg" width="20" height="20"/></button>
+                <button class="view-btn ${currentView === "grid4" ? "active" : ""}" onclick="setView('grid4')"><img src="../../assets/layout/grid-1525-svgrepo-com.svg" width="20" height="20"/></button>
+            </div>
+            <div class="tabs">
+                <div class="tab ${currentTab === "activas" ? "active" : ""}" onclick="setTab('activas')">Publicaciones</div>
+                <div class="tab ${currentTab === "historial" ? "active" : ""}" onclick="setTab('historial')">Vendidas</div>
+            </div>
+            <div class="content-area layout-${currentView}">
+                <div class="fab-add" style="${currentMode === 'desktop' ? 'width: 80px; height: 80px; bottom: 40px; right: 40px;' : ''}" onclick="openCreate()"><img src="../../assets/add-plus-svgrepo-com.svg" width="${currentMode === 'desktop' ? '40' : '24'}" height="${currentMode === 'desktop' ? '40' : '24'}"/></div>`;
+        data
+          .filter((d) => d.tab === currentTab)
+          .forEach((item) => {
+            const isAccepted = item.steps[1];
+            const isSold = item.tab === "historial";
+            
+            // --- Cálculo de gradiente para timeline vertical ---
+            let verticalGradient = "#eee"; // gris por defecto
+            if (item.steps[2] === true) {
+                verticalGradient = "linear-gradient(to bottom, var(--accent) 0%, var(--accent) 100%)";
+            } else if (item.steps[1] === true) {
+                verticalGradient = "linear-gradient(to bottom, var(--accent) 0%, var(--accent) 66%, #eee 66%, #eee 100%)";
+            } else {
+                verticalGradient = "#eee";
+            }
+            
+            // --- Cálculo de gradiente para timeline horizontal (dos segmentos) ---
+            let horizontalGradient = "#eee";
+            const segment1Done = item.steps[1] === true;  // entre CON OFERTAS y OFERTA ACEPTADA
+            const segment2Done = item.steps[2] === true;  // entre OFERTA ACEPTADA y VENTA REALIZADA
+            
+            if (segment1Done && segment2Done) {
+                horizontalGradient = "linear-gradient(90deg, var(--accent) 0%, var(--accent) 50%, var(--accent) 50%, var(--accent) 100%)";
+            } else if (segment1Done) {
+                horizontalGradient = "linear-gradient(90deg, var(--accent) 0%, var(--accent) 50%, #eee 50%, #eee 100%)";
+            } else if (segment2Done) {
+                horizontalGradient = "linear-gradient(90deg, #eee 0%, #eee 50%, var(--accent) 50%, var(--accent) 100%)";
+            } else {
+                horizontalGradient = "#eee";
+            }
+            html += `<div class="sale-card">
+                ${item.offers > 0 && !isAccepted && !isSold ? `<div class="badge-count">${item.offers}</div>` : ""}
+                ${currentView !== "grid4" ? `<div class="card-actions-top">${!isSold && !isAccepted ? `<div class="mini-btn-round" onclick='openEdit(${JSON.stringify(item).replace(/"/g, "&quot;")})'><img src="../../assets/pencil-svgrepo-com.svg" width="18" height="18"/></div><div class="mini-btn-round" style="color: #E24B4A;" onclick="document.getElementById('modal-delete').classList.add('active')"><img src="../../assets/trash-svgrepo-com.svg" width="18" height="18"/></div>` : `<div class="mini-btn-round" onclick='openStaticView(${JSON.stringify(item).replace(/"/g, "&quot;")})'><img src="../../assets/information-svgrepo-com.svg" width="18" height="18"/></div>${!isSold ? `<div class="mini-btn-round" style="color: #E24B4A;" onclick="document.getElementById('modal-delete').classList.add('active')"><img src="../../assets/trash-svgrepo-com.svg" width="18" height="18"/></div>` : ""}`}</div>` : ""}
+                <div class="img-thumb">5:6</div>
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between; padding: ${currentView === "grid4" ? "0" : "5px"}">
+                    ${currentView !== "grid4" 
+                        ? `<div>
+                            <b style="font-size:10px; text-transform:uppercase;">${item.name}</b>
+                            <div class="timeline-v" style="--line-gradient: ${verticalGradient}">
+                                <div class="step ${item.offers > 0 ? "done" : ""}">CON OFERTAS</div>
+                                <div class="step ${item.steps[1] ? "done" : ""}">OFERTA ACEPTADA</div>
+                                <div class="step ${item.steps[2] ? "done" : ""}">VENTA REALIZADA</div>
+                            </div>
+                        </div>` 
+                        : `
+                        <div style="display:flex; flex-direction:column; align-items:center;">
+                            <div class="timeline-h" style="--line-gradient-h: ${horizontalGradient}">
+                                <div class="dot ${item.offers > 0 ? "done" : ""}"></div>
+                                <div class="dot ${item.steps[1] ? "done" : ""}"></div>
+                                <div class="dot ${item.steps[2] ? "done" : ""}"></div>
+                            </div>
+                        </div>`
+                    }
+                    <div class="btn-row" style="${currentView === "grid4" ? "justify-content:center; padding-bottom:8px;" : currentView === "grid2" && currentMode === "mobile" ? "flex-direction:column; gap:5px;" : currentView === "grid2" ? "" : ""}">
+                        ${currentView === "grid4" ? `<button class="btn-circle-sm" onclick='openActionsCompact(${JSON.stringify(item).replace(/"/g, "&quot;")})' style="border:2px solid var(--line); background:rgba(0,0,0,0.05); cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center; border-radius:50%;"><img src="../../assets/dots-horizontal-svgrepo-com.svg" width="20" height="20"/></button>` : isSold ? `<button class="btn-action" style="width:100%; ${currentView === "grid2" ? "font-size:8px; padding:5px;" : ""}" onclick='openSaleInfo(${JSON.stringify(item).replace(/"/g, "&quot;")})'>Ver Venta</button>` : isAccepted ? `<button class="btn-secondary" style="${currentView === "grid2" && currentMode === "mobile" ? "width:100%;" : "flex:1;"} ${currentView === "grid2" ? "font-size:8px; padding:5px;" : ""}" onclick='openAcceptedOfferDetail()'>Oferta</button><button class="btn-action" style="${currentView === "grid2" && currentMode === "mobile" ? "width:100%;" : "flex:1;"} ${currentView === "grid2" ? "font-size:8px; padding:5px;" : ""}" onclick="openConfirm()">Entregado</button>` : item.offers > 0 ? `<button class="btn-action" style="width:100%; ${currentView === "grid2" ? "font-size:8px; padding:5px;" : ""}" onclick='openOffersModal(${JSON.stringify(item).replace(/"/g, "&quot;")})'>Ofertas</button>` : ""}
+                    </div>
+                </div>
+            </div>`;
+          });
+        html += `</div>${currentMode === "mobile" ? `<nav style="display:flex; justify-content:space-around; align-items:center; border-top:1px solid var(--line); padding:12px 0; background: #F8F7F4;"><button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/house-floor-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button><button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/cart-shopping-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button><button style="border:none; background:rgba(0,0,0,0.1); cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center; border-radius:50%;"><img src="../../assets/store-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button><button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/bell-alt-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button><button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/user-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button></nav>` : ""}`;
+        viewport.innerHTML = html;
+      }
+      render();
+    </script>
+  </body>
+</html>

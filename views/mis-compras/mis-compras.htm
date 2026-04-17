@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTRNA. - Mis Compras v4.6</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.typekit.net/yhs6ric.css" />
+    <link rel="stylesheet" href="mis-compras.css">
+</head>
+<body>
+
+    <div style="margin-bottom: 10px; display: flex; gap: 5px;">
+        <button onclick="switchMode('mobile')" style="padding: 5px 10px; cursor:pointer;">Mobile</button>
+        <button onclick="switchMode('desktop')" style="padding: 5px 10px; cursor:pointer;">Desktop</button>
+    </div>
+
+    <div id="viewport" class="view-mobile"></div>
+
+    
+
+    <div id="modal-view-static" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" onclick="event.stopPropagation()" style="width: 600px; max-width: 600px;">
+        <div style="padding:15px; font-weight:900; text-transform:uppercase; font-size:12px;">Detalles de la Prenda</div>
+        <div style="height:500px; overflow-y:auto;">
+          <div style="display:grid; grid-template-columns:120px 1fr; gap:16px; padding:12px; border-bottom:1px solid var(--line);">
+            <div><div style="aspect-ratio:3/4; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px; margin-bottom:8px;"></div><button id="toggle-photos-btn-mobile-view" class="btn-secondary" style="width:100%; padding:6px; font-size:10px; font-weight:700; cursor:pointer;" onclick="toggleMorePhotosMobileView()">Ver más</button></div>
+            <div><h4 style="margin:0 0 8px 0; font-size:14px; font-weight:700; line-height:1.2;" id="modal-static-name">NOMBRE</h4>
+            <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--line);"><div style="font-size:18px; font-weight:900; color:var(--accent);" id="modal-static-price">$0</div><div style="font-size:11px; color:#666; display:flex; align-items:center; gap:4px;"><img src="../../assets/handshake-svgrepo-com.svg" width="14" height="14"/> Negociable</div></div>
+            <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--line);"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:4px;">Categoría</div><div style="font-size:12px; font-weight:600;">Streetwear</div><div style="font-size:11px; color:#666;">Negro</div></div>
+            <div><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:4px;">Especificaciones</div><div style="font-size:12px; font-weight:600;">Hombre</div><div style="font-size:11px; color:#666;">Talla M · Usado buen estado</div></div></div>
+          </div>
+          <div id="more-photos-gallery-mobile-view" style="display:none; grid-template-columns:repeat(4, 1fr); gap:8px; padding:12px; border-bottom:1px solid var(--line);">
+            <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+            <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+            <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+            <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+          </div>
+          <div style="padding:12px; border-bottom:1px solid var(--line);"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Ubicación</div><div style="font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px;"><img src="../../assets/map-pin-alt-svgrepo-com.svg" width="14" height="14"/> Línea 1, Los Leones</div></div>
+          <div style="padding:12px;"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Descripción</div><p style="margin:0; font-size:11px; line-height:1.5; color:#555;">Chaqueta vintage en excelente estado, sin defectos. Poco uso, prácticamente nueva. Marca original, muy cómoda y versátil.</p></div>
+        </div>
+        <div style="padding:15px; display:flex; gap:10px; border-top:1px solid var(--line);">
+          <button onclick="closeModals()" class="btn-secondary" style="width: 100%; padding: 12px;">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-confirm" class="modal-overlay" onclick="closeModals()">
+        <div class="modal-content" style="padding: 40px 20px; text-align: center; max-width: 400px;" onclick="event.stopPropagation()">
+            <h3 style="font-weight: 900; text-transform: uppercase; font-size: 16px; margin-bottom: 15px;">¿Confirmar Recepción?</h3>
+            <p style="font-size: 12px; color: #666; margin-bottom: 30px;">Una vez confirmado, se cierra la transacción.</p>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn-secondary" style="flex: 1; padding: 12px;" onclick="closeModals()">No, Cancelar</button>
+              <button class="btn-action" style="flex: 1; padding: 12px;" onclick="confirmReceived()">Sí, Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-success-received" class="modal-overlay" onclick="closeModals()">
+        <div class="modal-content" style="padding: 40px 20px; text-align: center; max-width: 400px;" onclick="event.stopPropagation()">
+            <div style="font-size: 64px; margin-bottom: 20px;">
+              <img src="../../assets/check-svgrepo-com.svg" alt="success" style="width: 80px; height: 80px;">
+            </div>
+            <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 10px;">¡Producto Recibido!</h2>
+            <p style="font-size: 12px; color: #666; margin-bottom: 20px;">La transacción ha sido completada exitosamente.</p>
+            <button class="btn-action" style="width: 100%; padding: 12px;" onclick="closeModals()">Continuar</button>
+        </div>
+    </div>
+
+    <div id="modal-success-offer-cancelled" class="modal-overlay" onclick="closeModals()">
+        <div class="modal-content" style="padding: 40px 20px; text-align: center; max-width: 400px;" onclick="event.stopPropagation()">
+            <div style="font-size: 64px; margin-bottom: 20px;">
+              <img src="../../assets/xmark-svgrepo-com.svg" alt="success" style="width: 80px; height: 80px; stroke-width: 3;" stroke="var(--red)">
+            </div>
+            <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 10px;">Oferta Cancelada</h2>
+            <p style="font-size: 12px; color: #666; margin-bottom: 20px;">La oferta ha sido cancelada exitosamente.</p>
+            <button class="btn-action" style="width: 100%; padding: 12px;" onclick="closeModals()">Continuar</button>
+        </div>
+    </div>
+
+    <div id="modal-offer-detail" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div style="padding:15px; font-weight:900; text-transform:uppercase; font-size:12px; border-bottom: 1px solid var(--line);">Detalles de la Oferta</div>
+        <div style="padding:12px; display:flex; flex-direction:column; gap:12px;">
+          <!-- Monto ofrecido -->
+          <div style="display:flex; align-items:center; gap:6px;">
+            <img src="../../assets/circle-dollar-svgrepo-com.svg" width="16" height="16"/>
+            <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Monto</span>
+            <span style="font-size:13px; font-weight:900; color:var(--accent); flex:1; text-align:right;" id="offer-amount">$0</span>
+          </div>
+          
+          <!-- Fecha de oferta -->
+          <div style="display:flex; align-items:center; gap:6px;">
+            <img src="../../assets/calendar-alt-svgrepo-com.svg" width="14" height="14"/>
+            <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Enviada</span>
+            <span style="font-size:11px; font-weight:600; flex:1; text-align:right;" id="offer-date">-</span>
+          </div>
+          
+          <!-- Contacto -->
+          <div style="display:flex; align-items:center; gap:6px;">
+            <img src="../../assets/message-circle-chat-svgrepo-com.svg" width="14" height="14"/>
+            <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Contacto</span>
+            <div style="display:flex; align-items:center; gap:6px; flex:1; justify-content:flex-end;" id="offer-channels"></div>
+          </div>
+        </div>
+        <div style="padding:15px; border-top:1px solid var(--line); display:flex; gap:10px;">
+          <button id="btn-cancel-from-modal" class="btn-danger" style="flex:1; padding:12px; display:none;" onclick="openCancelConfirm()">Cancelar Oferta</button>
+          <button onclick="closeModals()" class="btn-secondary" style="flex:1; padding:12px;">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-actions-compact" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" style="width:280px;" onclick="event.stopPropagation()">
+        <div style="padding:15px; font-weight:900; text-transform:uppercase; font-size:12px; border-bottom:1px solid black;">Acciones</div>
+        <div style="display:flex; flex-direction:column; padding:10px; gap:10px;" id="compact-actions-container"></div>
+        <button onclick="closeModals()" style="width:100%; padding:15px; background:#eee; border:none; font-weight:900; font-size:10px; cursor:pointer;">Cerrar</button>
+      </div>
+    </div>
+
+    <div id="modal-cancel-confirm" class="modal-overlay" onclick="closeModals()">
+      <div
+        class="modal-content"
+        style="padding: 40px 20px; text-align: center; max-width: 400px;"
+        onclick="event.stopPropagation()"
+      >
+        <h3
+          style="
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 16px;
+            margin-bottom: 15px;
+          "
+        >
+          ¿Cancelar Oferta?
+        </h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 30px">
+          Esta acción no se puede deshacer.
+        </p>
+        <div style="display: flex; gap: 10px;">
+          <button
+            class="btn-secondary"
+            style="flex: 1; padding: 12px;"
+            onclick="closeModals()"
+          >
+            No, Mantener
+          </button>
+          <button
+            class="btn-danger"
+            style="flex: 1; padding: 12px;"
+            onclick="closeModals(); confirmCancel();"
+          >
+            Sí, Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-offer-history" class="modal-overlay" onclick="closeModals()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div style="padding:15px; font-weight:900; text-transform:uppercase; font-size:12px; border-bottom: 1px solid var(--line);">Detalles de la Oferta</div>
+        <div style="padding:12px; display:flex; flex-direction:column; gap:12px;">
+          <!-- Monto ofrecido -->
+          <div style="display:flex; align-items:center; gap:6px;">
+            <img src="../../assets/circle-dollar-svgrepo-com.svg" width="16" height="16"/>
+            <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Monto</span>
+            <span style="font-size:13px; font-weight:900; color:var(--accent); flex:1; text-align:right;" id="offer-history-amount">$0</span>
+          </div>
+          
+          <!-- Fecha de oferta -->
+          <div style="display:flex; align-items:center; gap:6px;">
+            <img src="../../assets/calendar-alt-svgrepo-com.svg" width="14" height="14"/>
+            <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Enviada</span>
+            <span style="font-size:11px; font-weight:600; flex:1; text-align:right;" id="offer-history-date">-</span>
+          </div>
+          
+          <!-- Fecha completada -->
+          <div style="display:flex; align-items:center; gap:6px;">
+            <img src="../../assets/check-svgrepo-com.svg" width="14" height="14"/>
+            <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Completada</span>
+            <span style="font-size:11px; font-weight:600; flex:1; text-align:right;" id="offer-history-completed">-</span>
+          </div>
+          
+          <!-- Contacto -->
+          <div style="display:flex; align-items:center; gap:6px;">
+            <img src="../../assets/message-circle-chat-svgrepo-com.svg" width="14" height="14"/>
+            <span style="font-size:10px; color:#666; text-transform:uppercase; font-weight:700;">Contacto</span>
+            <div style="display:flex; align-items:center; gap:6px; flex:1; justify-content:flex-end;" id="offer-history-channels"></div>
+          </div>
+        </div>
+        <div style="padding:15px; display:flex; gap:10px; border-top:1px solid var(--line);">
+          <button onclick="closeModals()" class="btn-secondary" style="flex:1; padding:12px;">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        let currentMode = 'mobile';
+        let currentView = 'list';
+        let currentTab = 'activas';
+
+        function switchMode(m) {
+            currentMode = m;
+            document.getElementById('viewport').className = (m === 'mobile') ? 'view-mobile' : 'view-desktop';
+            render();
+        }
+
+        function setView(v) { currentView = v; render(); }
+        function setTab(t) { currentTab = t; render(); }
+        
+        function openDetail(name, price, status) { 
+            document.getElementById('m-title').innerText = name;
+            document.getElementById('m-price').innerText = price;
+            document.getElementById('btn-cancel-offer').style.display = (status === 'pending') ? 'block' : 'none';
+            setModalTab(1);
+            document.getElementById('modal-detail').classList.add('active'); 
+        }
+        function closeDetail() { document.getElementById('modal-detail').classList.remove('active'); }
+        function openConfirm() { document.getElementById('modal-confirm').classList.add('active'); }
+        function confirmReceived() { document.getElementById('modal-confirm').classList.remove('active'); document.getElementById('modal-success-received').classList.add('active'); }
+        function confirmCancel() { document.getElementById('modal-cancel-confirm').classList.remove('active'); document.getElementById('modal-success-offer-cancelled').classList.add('active'); }
+        function closeModals() { 
+          document.getElementById('modal-view-static').classList.remove('active');
+          document.getElementById('modal-offer-detail').classList.remove('active');
+          document.getElementById('modal-offer-history').classList.remove('active');
+          document.getElementById('modal-actions-compact').classList.remove('active');
+        }
+
+        function openActionsCompact(item) {
+          const container = document.getElementById('compact-actions-container');
+          container.innerHTML = '';
+          const isSold = item.status === 'sold';
+          
+          if (isSold) {
+            container.innerHTML = `<button class="btn-secondary" onclick="closeModals(); openStaticView(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="width:100%; padding:12px; font-weight:900; text-transform:uppercase; font-size:10px; border:1px solid #ddd; background:none; cursor:pointer; border-radius:2px;">ℹ Ver Prenda</button><button class="btn-action" onclick="closeModals(); openOfferHistory(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="width:100%; padding:12px; font-weight:900; text-transform:uppercase; font-size:10px; border:none; background:var(--accent); color:white; cursor:pointer; border-radius:2px;">$ Ver Oferta</button>`;
+          } else {
+            container.innerHTML = `<button class="btn-secondary" onclick="closeModals(); openStaticView(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="width:100%; padding:12px; font-weight:900; text-transform:uppercase; font-size:10px; border:1px solid #ddd; background:none; cursor:pointer; border-radius:2px;">ℹ Ver Prenda</button><button class="btn-action" onclick="closeModals(); openOfferDetail(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="width:100%; padding:12px; font-weight:900; text-transform:uppercase; font-size:10px; border:none; background:var(--accent); color:white; cursor:pointer; border-radius:2px;">$ Oferta</button>${item.steps[1] === false ? `<button class="btn-danger" onclick="closeModals(); openCancelConfirm()" style="width:100%; padding:12px; font-weight:900; text-transform:uppercase; font-size:10px; border:none; background:var(--red); color:white; cursor:pointer; border-radius:2px;">✕ Cancelar</button>` : ''}`;
+          }
+          document.getElementById('modal-actions-compact').classList.add('active');
+        }
+
+        function openOfferDetail(item) {
+          if (!item.offerPrice) return; // Si no hay oferta, no abrir
+          
+          document.getElementById('offer-amount').innerText = item.offerPrice;
+          document.getElementById('offer-date').innerText = item.offerDate;
+          
+          // Mostrar/ocultar el botón de cancelación si no se ha llegado al contacto
+          const showCancelButton = item.steps[1] === false; // Si no ha llegado a contacto
+          document.getElementById('btn-cancel-from-modal').style.display = showCancelButton ? 'block' : 'none';
+          
+          // Crear iconos de canales con SVG
+          const channelsDiv = document.getElementById('offer-channels');
+          channelsDiv.innerHTML = '';
+          
+          const channelIcons = {
+            whatsapp: '../../assets/Communication/whatsapp-svgrepo-com.svg',
+            instagram: '../../assets/Communication/instagram-svgrepo-com.svg',
+            correo: '../../assets/Communication/mail-svgrepo-com.svg',
+            facebook: '../../assets/Communication/facebook-svgrepo-com.svg'
+          };
+          
+          item.channels.forEach(channel => {
+            if (channelIcons[channel]) {
+              const img = document.createElement('img');
+              img.src = channelIcons[channel];
+              img.width = 14;
+              img.height = 14;
+              img.style.cssText = 'flex-shrink:0;';
+              channelsDiv.appendChild(img);
+            }
+          });
+          
+          document.getElementById('modal-offer-detail').classList.add('active');
+        }
+
+        function openStaticView(item) {
+          const modalContent = document.querySelector('#modal-view-static .modal-content');
+          
+          // Establecer ancho según el modo
+          if (currentMode === 'mobile') {
+            modalContent.style.width = '350px';
+            modalContent.style.maxWidth = '350px';
+          } else {
+            modalContent.style.width = '600px';
+            modalContent.style.maxWidth = '600px';
+          }
+          
+          if (currentMode === 'mobile') {
+            // Mobile: layout compacto
+            modalContent.innerHTML = `
+              <div style="padding:15px; font-weight:900; text-transform:uppercase; font-size:12px;">Detalles de la Prenda</div>
+              <div style="height:300px; overflow-y:auto;">
+                <div style="display:grid; grid-template-columns:120px 1fr; gap:16px; padding:12px; border-bottom:1px solid var(--line);">
+                  <div><div style="aspect-ratio:3/4; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px; margin-bottom:8px;"></div><button id="toggle-photos-btn-mobile-view" class="btn-secondary" style="width:100%; padding:6px; font-size:10px; font-weight:700; cursor:pointer;" onclick="toggleMorePhotosMobileView()">Ver más</button></div>
+                  <div><h4 style="margin:0 0 8px 0; font-size:14px; font-weight:700; line-height:1.2;">${item.name}</h4>
+                  <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--line);"><div style="font-size:18px; font-weight:900; color:var(--accent);">${item.price}</div><div style="font-size:11px; color:#666; display:flex; align-items:center; gap:4px;"><img src="../../assets/handshake-svgrepo-com.svg" width="14" height="14"/> Negociable</div></div>
+                  <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--line);"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:4px;">Categoría</div><div style="font-size:12px; font-weight:600;">Streetwear</div><div style="font-size:11px; color:#666;">Negro</div></div>
+                  <div><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:4px;">Especificaciones</div><div style="font-size:12px; font-weight:600;">Hombre</div><div style="font-size:11px; color:#666;">Talla M · Usado buen estado</div></div></div>
+                </div>
+                <div id="more-photos-gallery-mobile-view" style="display:none; grid-template-columns:repeat(4, 1fr); gap:8px; padding:12px; border-bottom:1px solid var(--line);">
+                  <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                  <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                  <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                  <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                </div>
+                <div style="padding:12px; border-bottom:1px solid var(--line);"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Ubicación</div><div style="font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px;"><img src="../../assets/map-pin-alt-svgrepo-com.svg" width="14" height="14"/> Línea 1, Los Leones</div></div>
+                <div style="padding:12px;"><div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Descripción</div><p style="margin:0; font-size:11px; line-height:1.5; color:#555;">Chaqueta vintage en excelente estado, sin defectos. Poco uso, prácticamente nueva. Marca original, muy cómoda y versátil.</p></div>
+              </div>
+              <div style="padding:15px; display:flex; gap:10px; border-top:1px solid var(--line);">
+                <button onclick="closeModals()" class="btn-secondary" style="width: 100%; padding: 12px;">Cerrar</button>
+              </div>
+            `;
+          } else {
+            // Desktop: mantener layout original
+            modalContent.innerHTML = `
+              <div style="padding:15px; font-weight:900; text-transform:uppercase; font-size:12px;">Detalles de la Prenda</div>
+              <div style="height:350px; overflow-y:auto;">
+                <div style="display:grid; grid-template-columns:200px 1fr; gap:20px; padding:16px;">
+                  <div>
+                    <div style="aspect-ratio:3/4; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px; margin-bottom:12px;"></div>
+                    <button id="toggle-photos-btn-static" class="btn-secondary" style="width:100%; padding:8px; font-size:10px; font-weight:700; cursor:pointer;" onclick="toggleMorePhotosStatic()">Ver más fotos</button>
+                  </div>
+                  <div>
+                    <h3 style="margin:0 0 16px 0; font-size:18px; font-weight:700;">${item.name}</h3>
+                    <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--line);">
+                      <div style="font-size:24px; font-weight:900; color:var(--accent);">${item.price}</div>
+                      <div style="font-size:12px; color:#666; display:flex; align-items:center; gap:4px;"><img src="../../assets/handshake-svgrepo-com.svg" width="14" height="14"/> Negociable</div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                      <div>
+                        <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Categoría</div>
+                        <div style="font-size:13px; font-weight:600;">Streetwear</div>
+                        <div style="font-size:12px; color:#666;">Negro</div>
+                      </div>
+                      <div>
+                        <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Especificaciones</div>
+                        <div style="font-size:13px; font-weight:600;">Hombre</div>
+                        <div style="font-size:12px; color:#666;">Talla M · Usado buen estado</div>
+                      </div>
+                    </div>
+                    <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--line);">
+                      <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Ubicación</div>
+                      <div style="font-size:12px; display:flex; align-items:center; gap:6px;"><img src="../../assets/map-pin-alt-svgrepo-com.svg" width="14" height="14"/> Línea 1, Los Leones</div>
+                    </div>
+                    <div style="margin-top:12px;">
+                      <div style="font-size:10px; font-weight:900; text-transform:uppercase; color:#999; margin-bottom:6px;">Descripción</div>
+                      <p style="margin:0; font-size:12px; line-height:1.6; color:#555;">Chaqueta vintage en excelente estado, sin defectos. Poco uso, prácticamente nueva. Marca original, muy cómoda y versátil.</p>
+                    </div>
+                  </div>
+                </div>
+                <div id="more-photos-gallery-static" style="display:none; grid-template-columns:repeat(6, 1fr); gap:12px; padding:16px; border-top:1px solid var(--line);">
+                  <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                  <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                  <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                  <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                  <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                  <div style="aspect-ratio:1/1; background:linear-gradient(135deg, #d0d0d0 0%, #707070 100%); border-radius:2px;"></div>
+                </div>
+              </div>
+              <div style="padding:15px; display:flex; gap:10px; border-top:1px solid var(--line);">
+                <button onclick="closeModals()" class="btn-secondary" style="width: 100%; padding: 12px;">Cerrar</button>
+              </div>
+            `;
+          }
+          
+          document.getElementById('modal-view-static').classList.add('active');
+        }
+
+        function toggleMorePhotosMobileView() {
+          const gallery = document.getElementById('more-photos-gallery-mobile-view');
+          const btn = document.getElementById('toggle-photos-btn-mobile-view');
+          const isHidden = gallery.style.display === 'none';
+          gallery.style.display = isHidden ? 'grid' : 'none';
+          btn.textContent = isHidden ? 'Ver menos' : 'Ver más';
+        }
+
+        function toggleMorePhotosStatic() {
+          const gallery = document.getElementById('more-photos-gallery-static');
+          const btn = document.getElementById('toggle-photos-btn-static');
+          const isHidden = gallery.style.display === 'none';
+          gallery.style.display = isHidden ? 'grid' : 'none';
+          btn.textContent = isHidden ? 'Ver menos fotos' : 'Ver más fotos';
+        }
+
+        function setModalTab(n) {
+            document.getElementById('m-content-1').style.display = n === 1 ? 'block' : 'none';
+            document.getElementById('m-content-2').style.display = n === 2 ? 'block' : 'none';
+            document.getElementById('mt-1').classList.toggle('active', n === 1);
+            document.getElementById('mt-2').classList.toggle('active', n === 2);
+        }
+
+        function openCancelConfirm() {
+          document.getElementById('modal-cancel-confirm').classList.add('active');
+          event.stopPropagation();
+        }
+
+        function closeCancelConfirm() {
+          document.getElementById('modal-cancel-confirm').classList.remove('active');
+        }
+
+        function confirmCancel() {
+          alert('Oferta cancelada exitosamente');
+          closeCancelConfirm();
+          closeModals();
+        }
+
+        function openOfferHistory(item) {
+          if (!item.offerPrice) return;
+          
+          document.getElementById('offer-history-amount').innerText = item.offerPrice;
+          document.getElementById('offer-history-date').innerText = item.offerDate;
+          document.getElementById('offer-history-completed').innerText = item.completedDate || '-';
+          
+          // Crear iconos de canales con SVG
+          const channelsDiv = document.getElementById('offer-history-channels');
+          channelsDiv.innerHTML = '';
+          
+          const channelIcons = {
+            whatsapp: '../../assets/Communication/whatsapp-svgrepo-com.svg',
+            instagram: '../../assets/Communication/instagram-svgrepo-com.svg',
+            correo: '../../assets/Communication/mail-svgrepo-com.svg',
+            facebook: '../../assets/Communication/facebook-svgrepo-com.svg'
+          };
+          
+          item.channels.forEach(channel => {
+            if (channelIcons[channel]) {
+              const img = document.createElement('img');
+              img.src = channelIcons[channel];
+              img.width = 14;
+              img.height = 14;
+              img.style.cssText = 'flex-shrink:0;';
+              channelsDiv.appendChild(img);
+            }
+          });
+          
+          document.getElementById('modal-offer-history').classList.add('active');
+        }
+
+        const data = [
+            { id: 1, name: 'Vintage 90s Jacket', price: '$15.000', steps: [true, false, false], status: 'pending', tab: 'activas', offerPrice: '$12.000', offerDate: '02 Abr 2026', channels: ['whatsapp', 'instagram'] },
+            { id: 2, name: 'Levis 501 Custom', price: '$18.000', steps: [true, true, false], status: 'accepted', tab: 'activas', offerPrice: '$16.000', offerDate: '31 Mar 2026', channels: ['whatsapp', 'instagram', 'correo'] },
+            { id: 3, name: 'Archive Nike Bag', price: '$30.000', steps: [true, true, true], status: 'sold', tab: 'historial', offerPrice: '$28.500', offerDate: '25 Mar 2026', channels: ['whatsapp', 'instagram'], completedDate: '30 Mar 2026' },
+            { id: 4, name: 'Stussy Hoodie', price: '$25.000', steps: [true, true, false], status: 'accepted', tab: 'activas', offerPrice: '$22.500', offerDate: '28 Mar 2026', channels: ['whatsapp'] },
+            { id: 5, name: 'Carhartt Carpenter', price: '$22.000', steps: [true, false, false], status: 'pending', tab: 'activas', offerPrice: '$18.000', offerDate: '01 Abr 2026', channels: ['instagram', 'facebook', 'correo'] }
+        ];
+
+        function render() {
+            const viewport = document.getElementById('viewport');
+            const isGrid4 = currentView === 'grid4';
+            
+            let html = `
+                ${currentMode==='desktop' ? `<header style="justify-content:space-between; padding:20px 40px; border-bottom:1px solid var(--line); display:flex; align-items:center;"><div style="font-family:'strelka'; font-weight:700; font-size:20px;">VTRNA.</div><nav style="display:flex; gap:30px; align-items:center;"><button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/house-floor-svgrepo-com.svg" width="20" height="20"/></button><button style="border:none; background:rgba(0,0,0,0.1); cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center; border-radius:50%;"><img src="../../assets/cart-shopping-svgrepo-com.svg" width="20" height="20"/></button><button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/store-svgrepo-com.svg" width="20" height="20"/></button><button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/bell-alt-svgrepo-com.svg" width="20" height="20"/></button><button style="border:none; background:none; cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/user-svgrepo-com.svg" width="20" height="20"/></button></nav></header>` : ''}
+                <div class="main-header"><div class="header-title">Mis Compras</div></div>
+                <div class="view-controls">
+                    <button class="view-btn ${currentView==='list'?'active':''}" onclick="setView('list')"><img src="../../assets/layout/menu-svgrepo-com.svg" width="20" height="20"/></button>
+                    <button class="view-btn ${currentView==='grid2'?'active':''}" onclick="setView('grid2')"><img src="../../assets/layout/menu-navigation-grid-1528-svgrepo-com.svg" width="20" height="20"/></button>
+                    <button class="view-btn ${currentView==='grid4'?'active':''}" onclick="setView('grid4')"><img src="../../assets/layout/grid-1525-svgrepo-com.svg" width="20" height="20"/></button>
+                </div>
+                <div class="tabs">
+                    <div class="tab ${currentTab==='activas'?'active':''}" onclick="setTab('activas')">En Curso</div>
+                    <div class="tab ${currentTab==='historial'?'active':''}" onclick="setTab('historial')">Historial</div>
+                </div>
+                <div class="content-area layout-${currentView}">`;
+
+            data.filter(d => d.tab === currentTab).forEach(item => {
+                // --- Cálculo de gradiente para timeline vertical ---
+                let verticalGradient = "#eee"; // gris por defecto
+                if (item.steps[2] === true) {
+                    verticalGradient = "linear-gradient(to bottom, var(--accent) 0%, var(--accent) 100%)";
+                } else if (item.steps[1] === true) {
+                    verticalGradient = "linear-gradient(to bottom, var(--accent) 0%, var(--accent) 66%, #eee 66%, #eee 100%)";
+                } else {
+                    verticalGradient = "#eee";
+                }
+                
+                // --- Cálculo de gradiente para timeline horizontal (dos segmentos) ---
+                let horizontalGradient = "#eee";
+                const segment1Done = item.steps[1] === true;  // entre OFERTA y CONTACTO
+                const segment2Done = item.steps[2] === true;  // entre CONTACTO y RECIBIDO
+                
+                if (segment1Done && segment2Done) {
+                    horizontalGradient = "linear-gradient(90deg, var(--accent) 0%, var(--accent) 50%, var(--accent) 50%, var(--accent) 100%)";
+                } else if (segment1Done) {
+                    horizontalGradient = "linear-gradient(90deg, var(--accent) 0%, var(--accent) 50%, #eee 50%, #eee 100%)";
+                } else if (segment2Done) {
+                    horizontalGradient = "linear-gradient(90deg, #eee 0%, #eee 50%, var(--accent) 50%, var(--accent) 100%)";
+                } else {
+                    horizontalGradient = "#eee";
+                }
+                
+                html += `
+                    <div class="purchase-card">
+                        ${currentView !== 'grid4' ? `<div class="card-actions-top"><div class="mini-btn-round" onclick='openStaticView(${JSON.stringify(item).replace(/"/g, "&quot;")})'><img src="../../assets/information-svgrepo-com.svg" width="18" height="18"/></div>${item.steps[1] === false ? `<div class="mini-btn-round" style="border-color:var(--red);" onclick="openCancelConfirm()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>` : ''}</div>` : ''}
+                        <div class="img-thumb">5:6</div>
+                        <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between; padding: ${isGrid4 ? '0':'5px'}">
+                            
+                            ${currentView !== 'grid4' ? `
+                                <div>
+                                    <b style="font-size:10px; text-transform:uppercase; display:block; margin-bottom:2px;">${item.name}</b>
+                                    ${currentView === 'list' ? `<p style="font-family:'Space Mono'; font-size:10px; color:var(--accent)">${item.price}</p>` : ''}
+                                    <div class="timeline-v" style="--line-gradient: ${verticalGradient.replace(/"/g, '&quot;')}">
+                                        <div class="step done">OFERTA</div>
+                                        <div class="step ${item.steps[1]?'done':''}">CONTACTO</div>
+                                        <div class="step ${item.steps[2]?'done':''}">RECIBIDO</div>
+                                    </div>
+                                </div>` 
+                            : `
+                                <div style="display:flex; flex-direction:column; align-items:center;">
+                                    <div class="timeline-h" style="--line-gradient-h: ${horizontalGradient.replace(/"/g, '&quot;')}">
+                                        <div class="dot done"></div>
+                                        <div class="dot ${item.steps[1]?'done':''}"></div>
+                                        <div class="dot ${item.steps[2]?'done':''}"></div>
+                                    </div>
+                                </div>
+                            `}
+
+                            <div class="btn-row" style="${isGrid4?'justify-content:center; padding-bottom:8px;':currentView === 'grid2' && currentMode === 'mobile' ? 'flex-direction:column; gap:5px;' : ''}">
+                                ${isGrid4 ? `
+                                    <button class="btn-circle-sm" onclick='openActionsCompact(${JSON.stringify(item).replace(/"/g, "&quot;")})' style="border:2px solid var(--line); background:rgba(0,0,0,0.05); cursor:pointer; padding:8px; display:flex; align-items:center; justify-content:center; border-radius:50%;"><img src="../../assets/dots-horizontal-svgrepo-com.svg" width="20" height="20"/></button>
+                                ` : `
+                                    ${item.status === 'sold' ? `<button class="btn-secondary" style="width:100%; ${currentView === 'grid2' ? 'font-size:8px; padding:5px;' : 'padding:8px;'}" onclick='openOfferHistory(${JSON.stringify(item).replace(/"/g, "&quot;")})'>Oferta</button>` : `<button class="btn-secondary" style="width:100%; ${currentView === 'grid2' ? 'font-size:8px; padding:5px;' : 'padding:8px;'}" onclick='openOfferDetail(${JSON.stringify(item).replace(/"/g, "&quot;")})'>Oferta</button>`}
+                                    ${item.status === 'accepted' ? `<button class="btn-action" style="width:100%; ${currentView === 'grid2' ? 'font-size:8px; padding:5px;' : 'padding:8px;'}" onclick="openConfirm()">Recibido</button>` : ''}
+                                `}
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            html += `</div>
+                ${currentMode==='mobile' ? `<nav style="display:flex; justify-content:space-around; align-items:center; border-top:1px solid var(--line); padding:12px 0; background: #F8F7F4;"><button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/house-floor-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button><button style="border:none; background:rgba(0,0,0,0.1); cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center; border-radius:50%;"><img src="../../assets/cart-shopping-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button><button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/store-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button><button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/bell-alt-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button><button style="border:none; background:none; cursor:pointer; padding:10px; display:flex; align-items:center; justify-content:center;"><img src="../../assets/user-svgrepo-com.svg" width="24" height="24" style="filter: invert(0%);"/></button></nav>` : ''}
+            `;
+            viewport.innerHTML = html;
+        }
+        render();
+    </script>
+</body>
+</html>

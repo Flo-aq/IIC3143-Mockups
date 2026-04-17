@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTRNA. - Sign Up</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.typekit.net/yhs6ric.css" />
+    <link rel="stylesheet" href="sign-up.css">
+</head>
+<body>
+
+    <div style="margin-bottom: 10px; display: flex; gap: 5px;">
+        <button onclick="switchMode('mobile')" style="padding: 5px 10px; cursor: pointer;">Mobile</button>
+        <button onclick="switchMode('desktop')" style="padding: 5px 10px; cursor: pointer;">Desktop</button>
+    </div>
+
+    <div id="viewport" class="view-mobile">
+        <header class="signup-header">
+            <div class="logo" style="font-family: 'strelka', sans-serif; font-weight: 700;">VTRNA.</div>
+            <nav class="nav-top">
+                <button class="nav-btn nav-text" onclick="alert('About Us - Próximamente')">About Us</button>
+                <button class="nav-btn nav-text" onclick="alert('FAQ - Próximamente')">FAQ</button>
+                <button class="nav-btn nav-primary" onclick="alert('Estás en Sign Up')">Sign Up</button>
+                <button class="nav-btn nav-secondary" onclick="alert('Login - Próximamente')">Login</button>
+            </nav>
+            <button class="nav-menu-btn" onclick="toggleMobileMenu()">
+                <img src="../../assets/menu-svgrepo-com.svg" alt="menu" style="width: 20px; height: 20px;">
+            </button>
+        </header>
+
+        <!-- MOBILE MENU DROPDOWN -->
+        <div id="mobile-menu" class="mobile-menu">
+            <button class="mobile-menu-item nav-text" onclick="alert('About Us - Próximamente'); toggleMobileMenu()">About Us</button>
+            <button class="mobile-menu-item nav-text" onclick="alert('FAQ - Próximamente'); toggleMobileMenu()">FAQ</button>
+            <button class="mobile-menu-item nav-primary" onclick="alert('Estás en Sign Up'); toggleMobileMenu()">Sign Up</button>
+            <button class="mobile-menu-item nav-secondary" onclick="alert('Login - Próximamente'); toggleMobileMenu()">Login</button>
+        </div>
+
+        <div class="signup-initial-body" id="signup-initial-body"></div>
+    </div>
+
+    <!-- SIGNUP SUCCESS MODAL -->
+    <div id="signup-modal" class="signup-modal-overlay">
+      <div class="signup-modal-content">
+        <div style="padding: 40px 20px; text-align: center;">
+          <div style="font-size: 64px; margin-bottom: 20px;">
+            <img src="../../assets/done/user-check-svgrepo-com.svg" alt="success" style="width: 80px; height: 80px;">
+          </div>
+          <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 10px;">¡Cuenta Creada!</h2>
+          <p style="font-size: 14px; color: #666; margin-bottom: 30px;">Bienvenido a VTRNA.</p>
+          <button class="btn-action" style="width: 100%; padding: 12px; border-radius: 24px;" onclick="cerrarSignupModal()">Continuar</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        let currentMode = 'mobile';
+        let signupStep = 1;
+
+        function switchMode(m) {
+            currentMode = m;
+            const viewport = document.getElementById('viewport');
+            viewport.className = m === 'mobile' ? 'view-mobile' : 'view-desktop';
+            // Cerrar menú y modal al cambiar a desktop
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.remove('active');
+            const modal = document.getElementById('signup-modal');
+            if (modal) modal.classList.remove('active');
+            renderSignup();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) {
+                menu.classList.toggle('active');
+            }
+        }
+
+        function mostrarSignupModal() {
+            const modal = document.getElementById('signup-modal');
+            if (modal) {
+                modal.classList.add('active');
+                setTimeout(() => {
+                    cerrarSignupModal();
+                }, 1500);
+            }
+        }
+
+        function cerrarSignupModal() {
+            const modal = document.getElementById('signup-modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            signupStep = 1;
+            renderSignup();
+        }
+
+        function moveSignupStep(delta) {
+            const newStep = signupStep + delta;
+            if (newStep >= 1 && newStep <= 2) {
+                signupStep = newStep;
+                renderSignup();
+            }
+        }
+
+        function renderSignup() {
+            let stepContent = '';
+            if (signupStep === 1) {
+                stepContent = `
+                    <div style="padding:100px 20px; height: 100%; display:flex; flex-direction:column; justify-content:center;">
+                        <h1 style="font-size:28px; font-weight:900; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; text-align:center; height: stretch;">Sign Up</h1>
+                        <div>
+                            <div class="form-group" style="padding:0 0 15px 0; border-bottom:1px solid var(--line);">
+                                <label class="form-label">Correo</label>
+                                <div class="form-input-wrapper">
+                                    <img src="../../assets/mail-alt-svgrepo-com.svg" alt="mail" class="form-input-icon">
+                                    <input type="email" class="form-input" placeholder="tu@email.com" />
+                                </div>
+                            </div>
+                            <div class="form-group" style="padding:15px 0 15px 0; border-bottom:1px solid var(--line);">
+                                <label class="form-label">Confirmar Correo</label>
+                                <div class="form-input-wrapper">
+                                    <img src="../../assets/mail-alt-svgrepo-com.svg" alt="mail" class="form-input-icon">
+                                    <input type="email" class="form-input" placeholder="tu@email.com" />
+                                </div>
+                            </div>
+                            <div class="form-group" style="padding:15px 0 15px 0; border-bottom:1px solid var(--line);">
+                                <label class="form-label">Contraseña</label>
+                                <div class="form-input-wrapper">
+                                    <img src="../../assets/lock-alt-svgrepo-com.svg" alt="lock" class="form-input-icon">
+                                    <input type="password" class="form-input" placeholder="••••••••" />
+                                </div>
+                            </div>
+                            <div class="form-group" style="padding:15px 0 0 0; border-bottom:none;">
+                                <label class="form-label">Confirmar Contraseña</label>
+                                <div class="form-input-wrapper">
+                                    <img src="../../assets/lock-alt-svgrepo-com.svg" alt="lock" class="form-input-icon">
+                                    <input type="password" class="form-input" placeholder="••••••••" />
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-action" style="width:100%; margin-top:40px;" onclick="moveSignupStep(1)">Siguiente</button>
+                    </div>`;
+            } else if (signupStep === 2) {
+                stepContent = `
+                    <div style="padding:100px 20px; height: 100%; display:flex; flex-direction:column; justify-content:center;">
+                        <h1 style="font-size:28px; font-weight:900; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; text-align:center; height: stretch;">sign up</h1>
+                        <div>
+                            <div style="width:150px; height:150px; margin:30px auto; background:var(--placeholder); border:2px dashed black; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+                                <img src="../../assets/user-plus-svgrepo-com.svg" alt="user" style="width:60px; height:60px;">
+                            </div>
+                            
+                            <div class="form-group" style="padding:0 0 15px 0; border-bottom: none; text-align:left;">
+                                <label class="form-label">Nombre de Usuario</label>
+                                <div class="form-input-wrapper">
+                                    <img src="../../assets/email-svgrepo-com.svg" alt="user" class="form-input-icon">
+                                    <input type="text" class="form-input" placeholder="@tunombre" />
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px; padding-top:100px;">
+                            <button class="btn-secondary" style="flex:1;" onclick="moveSignupStep(-1)">Atrás</button>
+                            <button class="btn-action" style="flex:1;" onclick="mostrarSignupModal()">Crear Cuenta</button>
+                        </div>
+                    </div>`;
+            }
+            document.getElementById('signup-initial-body').innerHTML = stepContent;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderSignup);
+    </script>
+
+</body>
+</html>

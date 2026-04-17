@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTRNA. - Landing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.typekit.net/yhs6ric.css" />
+    <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+
+    <div style="margin-bottom: 10px; display: flex; gap: 5px;">
+        <button onclick="switchMode('mobile')" style="padding: 5px 10px; cursor: pointer;">Mobile</button>
+        <button onclick="switchMode('desktop')" style="padding: 5px 10px; cursor: pointer;">Desktop</button>
+    </div>
+
+    <div id="viewport" class="view-mobile">
+        <header class="landing-header">
+            <div class="logo" style="font-family: 'strelka', sans-serif; font-weight: 700;">VTRNA.</div>
+            <nav class="nav-top">
+                <button class="nav-btn nav-text" onclick="alert('About Us - Próximamente')">About Us</button>
+                <button class="nav-btn nav-text" onclick="alert('FAQ - Próximamente')">FAQ</button>
+                <button class="nav-btn nav-primary" onclick="alert('Sign Up - Próximamente')">Sign Up</button>
+                <button class="nav-btn nav-secondary" onclick="alert('Login - Próximamente')">Login</button>
+            </nav>
+            <button class="nav-menu-btn" onclick="toggleMobileMenu()">
+                <img src="../../assets/menu-svgrepo-com.svg" alt="menu" style="width: 20px; height: 20px;">
+            </button>
+        </header>
+
+        <!-- MOBILE MENU DROPDOWN -->
+        <div id="mobile-menu" class="mobile-menu">
+            <button class="mobile-menu-item nav-text" onclick="alert('About Us - Próximamente'); toggleMobileMenu()">About Us</button>
+            <button class="mobile-menu-item nav-text" onclick="alert('FAQ - Próximamente'); toggleMobileMenu()">FAQ</button>
+            <button class="mobile-menu-item nav-primary" onclick="alert('Sign Up - Próximamente'); toggleMobileMenu()">Sign Up</button>
+            <button class="mobile-menu-item nav-secondary" onclick="alert('Login - Próximamente'); toggleMobileMenu()">Login</button>
+        </div>
+
+        <div class="landing-body">
+            <div class="hero-content">
+                <h1 class="hero-title">Compra y vende moda vintage</h1>
+                <p class="hero-subtitle">La plataforma para encontrar piezas únicas y vender lo que no usas</p>
+            </div>
+
+            <div class="cta-buttons">
+                <button class="btn btn-primary" onclick="alert('Sign Up - Próximamente')">Crear Cuenta</button>
+                <button class="btn btn-secondary" onclick="alert('Login - Próximamente')">Iniciar Sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'mobile';
+
+        function switchMode(m) {
+            currentMode = m;
+            const viewport = document.getElementById('viewport');
+            if (m === 'mobile') {
+                viewport.className = 'view-mobile';
+            } else {
+                viewport.className = 'view-desktop';
+                // Cerrar menú al cambiar a desktop
+                const menu = document.getElementById('mobile-menu');
+                if (menu) menu.classList.remove('active');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) {
+                menu.classList.toggle('active');
+            }
+        }
+    </script>
+
+</body>
+</html>
