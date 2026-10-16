@@ -2,6 +2,8 @@
 
 Prototipos HTML/CSS/JS de la interfaz de **VTRNA**, una plataforma para comprar y vender ropa vintage, diseñados para el curso IIC3143 (Desarrollo de Software, PUC Chile). Sirvieron para validar los flujos de usuario antes de implementar el frontend del proyecto.
 
+Creé la marca VTRNA (nombre, logo, paleta de colores y estilo gráfico) y diseñé la app, sus mockups y los flujos de usuario. El frontend real está en [VTRNA-frontend](https://github.com/Flo-aq/VTRNA-frontend).
+
 ![Vistas móviles: landing, registro, swipe y mis ventas](docs/vistas.png)
 
 ## Pantallas
